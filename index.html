@@ -1,0 +1,1821 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>农产品全链条溯源仿真实训平台</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Microsoft YaHei', sans-serif; background: #f0f4f8; }
+
+  /* 顶部导航 */
+  .header {
+    background: linear-gradient(135deg, #1a7f3c 0%, #2ecc71 100%);
+    color: white; padding: 0 32px;
+    display: flex; align-items: center; justify-content: space-between;
+    height: 64px; box-shadow: 0 2px 12px rgba(0,0,0,0.15);
+  }
+  .header .logo { display: flex; align-items: center; gap: 12px; }
+  .header .logo span { font-size: 20px; font-weight: bold; letter-spacing: 1px; }
+  .header .logo .icon { font-size: 28px; }
+  .header .info { font-size: 13px; opacity: 0.85; }
+
+  /* 流程进度条 */
+  .progress-bar {
+    background: white; padding: 20px 32px;
+    display: flex; align-items: center; justify-content: center;
+    gap: 0; box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+  }
+  .step {
+    display: flex; flex-direction: column; align-items: center;
+    cursor: pointer; position: relative; flex: 1; max-width: 140px;
+  }
+  .step-circle {
+    width: 48px; height: 48px; border-radius: 50%;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 20px; font-weight: bold; border: 3px solid #ddd;
+    background: white; color: #999; transition: all 0.3s; z-index: 1;
+  }
+  .step.active .step-circle { background: #1a7f3c; border-color: #1a7f3c; color: white; box-shadow: 0 4px 12px rgba(26,127,60,0.4); }
+  .step.done .step-circle { background: #e8f5e9; border-color: #1a7f3c; color: #1a7f3c; }
+  .step-label { font-size: 12px; color: #666; margin-top: 6px; text-align: center; white-space: nowrap; }
+  .step.active .step-label { color: #1a7f3c; font-weight: bold; }
+  .step-line {
+    flex: 1; height: 3px; background: #ddd; margin: 0 -4px;
+    margin-bottom: 22px; transition: background 0.3s;
+  }
+  .step-line.done { background: #1a7f3c; }
+
+  /* 主内容区 */
+  .main { padding: 24px 32px; max-width: 1200px; margin: 0 auto; }
+
+  /* 角色选择页 */
+  .role-page { display: none; }
+  .role-page.active { display: block; }
+
+  .page-title {
+    font-size: 22px; font-weight: bold; color: #222;
+    margin-bottom: 6px;
+  }
+  .page-subtitle { font-size: 14px; color: #888; margin-bottom: 24px; }
+
+  /* 角色卡片 */
+  .role-grid {
+    display: grid; grid-template-columns: repeat(5, 1fr); gap: 16px;
+    margin-bottom: 32px;
+  }
+  .role-card {
+    background: white; border-radius: 12px; padding: 20px 16px;
+    text-align: center; cursor: pointer; border: 2px solid transparent;
+    transition: all 0.2s; box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+  }
+  .role-card:hover { transform: translateY(-3px); box-shadow: 0 6px 20px rgba(0,0,0,0.1); }
+  .role-card.selected { border-color: #1a7f3c; background: #f0faf4; }
+  .role-card .emoji { font-size: 40px; margin-bottom: 8px; }
+  .role-card .role-name { font-size: 15px; font-weight: bold; color: #333; margin-bottom: 4px; }
+  .role-card .role-desc { font-size: 12px; color: #888; line-height: 1.5; }
+
+  /* 内容卡片 */
+  .content-card {
+    background: white; border-radius: 12px; padding: 24px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.06); margin-bottom: 20px;
+  }
+  .card-title {
+    font-size: 16px; font-weight: bold; color: #1a7f3c;
+    margin-bottom: 16px; padding-bottom: 10px;
+    border-bottom: 2px solid #e8f5e9;
+    display: flex; align-items: center; gap: 8px;
+  }
+
+  /* 表单样式 */
+  .form-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+  .form-group { display: flex; flex-direction: column; gap: 6px; }
+  .form-group.full { grid-column: 1 / -1; }
+  .form-group label { font-size: 13px; color: #555; font-weight: 500; }
+  .form-group input, .form-group select, .form-group textarea {
+    border: 1.5px solid #ddd; border-radius: 8px; padding: 9px 12px;
+    font-size: 14px; font-family: inherit; transition: border-color 0.2s;
+    outline: none;
+  }
+  .form-group input:focus, .form-group select:focus, .form-group textarea:focus {
+    border-color: #1a7f3c;
+  }
+  .form-group textarea { resize: vertical; min-height: 80px; }
+
+  /* 按钮 */
+  .btn {
+    padding: 10px 28px; border-radius: 8px; border: none;
+    font-size: 14px; font-weight: bold; cursor: pointer; transition: all 0.2s;
+    font-family: inherit;
+  }
+  .btn-primary { background: #1a7f3c; color: white; }
+  .btn-primary:hover { background: #156830; box-shadow: 0 4px 12px rgba(26,127,60,0.3); }
+  .btn-secondary { background: #f0f4f8; color: #555; }
+  .btn-secondary:hover { background: #e0e7ef; }
+  .btn-danger { background: #e74c3c; color: white; }
+  .btn-danger:hover { background: #c0392b; }
+  .btn-warning { background: #f39c12; color: white; }
+  .btn-warning:hover { background: #d68910; }
+  .btn-sm { padding: 6px 16px; font-size: 13px; }
+
+  /* 数据表格 */
+  table { width: 100%; border-collapse: collapse; }
+  th {
+    background: #f0faf4; color: #1a7f3c; font-size: 13px;
+    padding: 10px 14px; text-align: left; border-bottom: 2px solid #d0ead8;
+  }
+  td { padding: 10px 14px; font-size: 13px; border-bottom: 1px solid #f0f4f8; color: #444; }
+  tr:hover td { background: #fafffe; }
+
+  /* 哈希区块链展示 */
+  .blockchain-view { display: flex; gap: 0; overflow-x: auto; padding-bottom: 8px; }
+  .block {
+    min-width: 200px; background: white; border: 2px solid #d0ead8;
+    border-radius: 10px; padding: 14px; position: relative;
+    transition: all 0.3s;
+  }
+  .block.tampered { border-color: #e74c3c; background: #fff5f5; }
+  .block-arrow {
+    display: flex; align-items: center; padding: 0 8px;
+    color: #1a7f3c; font-size: 20px; font-weight: bold;
+  }
+  .block-header { font-size: 11px; font-weight: bold; color: #888; margin-bottom: 8px; }
+  .block-hash {
+    font-family: monospace; font-size: 11px;
+    color: #1a7f3c; word-break: break-all; line-height: 1.4;
+  }
+  .block.tampered .block-hash { color: #e74c3c; }
+  .block-data { font-size: 12px; color: #555; margin: 8px 0; line-height: 1.5; }
+  .hash-label { font-size: 10px; color: #999; margin-top: 4px; }
+
+  /* 地图运输 */
+  .map-container {
+    background: #e8f4e8; border-radius: 10px; height: 300px;
+    position: relative; overflow: hidden; border: 1px solid #cce0cc;
+  }
+  .map-svg { width: 100%; height: 100%; }
+  .map-info {
+    position: absolute; top: 12px; right: 12px;
+    background: white; border-radius: 8px; padding: 12px 16px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.1); font-size: 13px;
+  }
+  .temp-gauge {
+    display: flex; align-items: center; gap: 8px; margin-top: 8px;
+  }
+  .temp-bar {
+    flex: 1; height: 8px; background: #ddd; border-radius: 4px; overflow: hidden;
+  }
+  .temp-fill {
+    height: 100%; border-radius: 4px; transition: width 1s, background 0.5s;
+  }
+
+  /* 溯源查询 */
+  .trace-search {
+    display: flex; gap: 12px; margin-bottom: 20px;
+  }
+  .trace-search input { flex: 1; }
+  .trace-timeline { position: relative; padding-left: 30px; }
+  .trace-timeline::before {
+    content: ''; position: absolute; left: 11px; top: 0; bottom: 0;
+    width: 2px; background: #d0ead8;
+  }
+  .trace-item {
+    position: relative; margin-bottom: 20px;
+    background: white; border-radius: 10px; padding: 14px 16px;
+    border: 1px solid #e8f5e9; transition: all 0.3s;
+  }
+  .trace-item.warning { border-color: #f39c12; background: #fffbf0; }
+  .trace-item::before {
+    content: ''; position: absolute; left: -23px; top: 16px;
+    width: 14px; height: 14px; border-radius: 50%;
+    background: #1a7f3c; border: 2px solid white;
+    box-shadow: 0 0 0 2px #1a7f3c;
+  }
+  .trace-item.warning::before { background: #f39c12; box-shadow: 0 0 0 2px #f39c12; }
+  .trace-item-title { font-weight: bold; font-size: 14px; color: #333; margin-bottom: 4px; }
+  .trace-item-detail { font-size: 12px; color: #888; }
+
+  /* 标签/徽章 */
+  .badge {
+    display: inline-block; padding: 3px 10px; border-radius: 20px;
+    font-size: 12px; font-weight: 500;
+  }
+  .badge-green { background: #e8f5e9; color: #1a7f3c; }
+  .badge-red { background: #fdecea; color: #e74c3c; }
+  .badge-orange { background: #fff3e0; color: #f39c12; }
+  .badge-blue { background: #e3f2fd; color: #1976d2; }
+
+  /* 警告框 */
+  .alert {
+    border-radius: 8px; padding: 12px 16px; margin-bottom: 16px;
+    display: flex; align-items: flex-start; gap: 10px; font-size: 14px;
+  }
+  .alert-warning { background: #fff3e0; border-left: 4px solid #f39c12; color: #7d4e00; }
+  .alert-success { background: #e8f5e9; border-left: 4px solid #1a7f3c; color: #1a4a28; }
+  .alert-error { background: #fdecea; border-left: 4px solid #e74c3c; color: #7d1f1f; }
+  .alert-info { background: #e3f2fd; border-left: 4px solid #1976d2; color: #0d3c6e; }
+
+  /* 评分/结果 */
+  .result-panel {
+    background: linear-gradient(135deg, #1a7f3c, #2ecc71);
+    border-radius: 12px; padding: 28px; color: white; text-align: center;
+  }
+  .score { font-size: 64px; font-weight: bold; line-height: 1; }
+  .score-label { font-size: 16px; opacity: 0.85; margin-top: 4px; }
+
+  /* 仓库货架可视化 */
+  .warehouse-grid {
+    display: grid; grid-template-columns: repeat(8, 1fr); gap: 6px;
+    background: #f0f4f8; padding: 16px; border-radius: 10px;
+  }
+  .shelf-cell {
+    aspect-ratio: 1; border-radius: 6px; border: 2px solid #ddd;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 10px; cursor: pointer; transition: all 0.2s;
+    background: white; color: #999;
+  }
+  .shelf-cell.occupied { background: #e8f5e9; border-color: #1a7f3c; color: #1a7f3c; font-size: 14px; }
+  .shelf-cell.selected { background: #1a7f3c; border-color: #156830; color: white; }
+  .shelf-cell.warning { background: #fff3e0; border-color: #f39c12; color: #f39c12; }
+  .shelf-cell:hover { transform: scale(1.05); }
+
+  /* 底部操作栏 */
+  .action-bar {
+    display: flex; justify-content: space-between; align-items: center;
+    padding: 16px 32px; background: white;
+    box-shadow: 0 -2px 8px rgba(0,0,0,0.06);
+    position: sticky; bottom: 0;
+  }
+
+  /* 弹窗 */
+  .modal-overlay {
+    display: none; position: fixed; inset: 0;
+    background: rgba(0,0,0,0.4); z-index: 1000;
+    align-items: center; justify-content: center;
+  }
+  .modal-overlay.show { display: flex; }
+  .modal {
+    background: white; border-radius: 16px; padding: 28px;
+    max-width: 480px; width: 90%; box-shadow: 0 20px 60px rgba(0,0,0,0.2);
+    animation: slideUp 0.3s ease;
+  }
+  @keyframes slideUp { from { transform: translateY(20px); opacity: 0; } to { transform: translateY(0); opacity: 1; } }
+  .modal-title { font-size: 18px; font-weight: bold; color: #222; margin-bottom: 12px; }
+  .modal-body { color: #555; font-size: 14px; line-height: 1.6; margin-bottom: 20px; }
+  .modal-actions { display: flex; gap: 10px; justify-content: flex-end; }
+
+  /* 任务提示 */
+  .task-hint {
+    background: #e3f2fd; border-radius: 8px; padding: 12px 16px;
+    font-size: 13px; color: #0d47a1; margin-bottom: 16px;
+    border-left: 4px solid #1976d2;
+  }
+
+  /* 响应式 */
+  @media (max-width: 768px) {
+    .role-grid { grid-template-columns: repeat(3, 1fr); }
+    .form-grid { grid-template-columns: 1fr; }
+    .main { padding: 16px; }
+  }
+
+  /* 二维码样式 */
+  .qrcode-container {
+    text-align: center;
+    padding: 20px;
+    background: linear-gradient(135deg, #f0faf4 0%, #e8f5e9 100%);
+    border-radius: 12px;
+    margin-top: 16px;
+  }
+  .qrcode-container img {
+    width: 160px;
+    height: 160px;
+    border-radius: 8px;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.1);
+  }
+  .qrcode-tip {
+    margin-top: 12px;
+    font-size: 13px;
+    color: #666;
+  }
+  .qrcode-tip strong {
+    color: #1a7f3c;
+  }
+  .qrcode-actions {
+    margin-top: 16px;
+    display: flex;
+    gap: 10px;
+    justify-content: center;
+  }
+  .wechat-scan-hint {
+    background: #f0faf4;
+    border: 2px dashed #1a7f3c;
+    border-radius: 12px;
+    padding: 16px;
+    margin-top: 16px;
+    text-align: center;
+  }
+  .wechat-scan-hint .icon {
+    font-size: 40px;
+    display: block;
+    margin-bottom: 8px;
+  }
+  .wechat-scan-hint .text {
+    color: #1a7f3c;
+    font-weight: bold;
+  }
+  .wechat-scan-hint .sub {
+    font-size: 12px;
+    color: #888;
+    margin-top: 4px;
+  }
+
+  /* 滚动条美化 */
+  ::-webkit-scrollbar { width: 6px; height: 6px; }
+  ::-webkit-scrollbar-track { background: #f0f4f8; }
+  ::-webkit-scrollbar-thumb { background: #c0d8c8; border-radius: 3px; }
+</style>
+</head>
+<body>
+
+<!-- 顶部导航 -->
+<div class="header">
+  <div class="logo">
+    <span class="icon">🌾</span>
+    <span>农产品全链条溯源仿真实训平台</span>
+  </div>
+  <div class="info" id="sessionInfo">实训室：供应链管理实训室 | 班级：— | 姓名：—</div>
+</div>
+
+<!-- 流程进度条 -->
+<div class="progress-bar">
+  <div class="step active" id="step0" onclick="goToStep(0)">
+    <div class="step-circle">①</div>
+    <div class="step-label">选择角色</div>
+  </div>
+  <div class="step-line" id="line0"></div>
+  <div class="step" id="step1" onclick="goToStep(1)">
+    <div class="step-circle">②</div>
+    <div class="step-label">产地录入</div>
+  </div>
+  <div class="step-line" id="line1"></div>
+  <div class="step" id="step2" onclick="goToStep(2)">
+    <div class="step-circle">③</div>
+    <div class="step-label">检测上链</div>
+  </div>
+  <div class="step-line" id="line2"></div>
+  <div class="step" id="step3" onclick="goToStep(3)">
+    <div class="step-circle">④</div>
+    <div class="step-label">仓储管理</div>
+  </div>
+  <div class="step-line" id="line3"></div>
+  <div class="step" id="step4" onclick="goToStep(4)">
+    <div class="step-circle">⑤</div>
+    <div class="step-label">冷链运输</div>
+  </div>
+  <div class="step-line" id="line4"></div>
+  <div class="step" id="step5" onclick="goToStep(5)">
+    <div class="step-circle">⑥</div>
+    <div class="step-label">溯码查验</div>
+  </div>
+  <div class="step-line" id="line5"></div>
+  <div class="step" id="step6" onclick="goToStep(6)">
+    <div class="step-circle">⑦</div>
+    <div class="step-label">实训总结</div>
+  </div>
+</div>
+
+<div class="main">
+
+<!-- ===== 页面0：角色选择 ===== -->
+<div class="role-page active" id="page0">
+  <div class="page-title">欢迎进入农产品溯源实训</div>
+  <div class="page-subtitle">请填写基本信息，并了解本次实训流程</div>
+
+  <div class="content-card">
+    <div class="card-title">📋 学生信息登记</div>
+    <div class="form-grid">
+      <div class="form-group">
+        <label>姓名</label>
+        <input type="text" id="studentName" placeholder="请输入您的姓名">
+      </div>
+      <div class="form-group">
+        <label>学号</label>
+        <input type="text" id="studentId" placeholder="请输入学号">
+      </div>
+      <div class="form-group">
+        <label>班级</label>
+        <input type="text" id="className" placeholder="如：供应链2401班">
+      </div>
+      <div class="form-group">
+        <label>实训日期</label>
+        <input type="date" id="trainDate">
+      </div>
+    </div>
+  </div>
+
+  <div class="content-card">
+    <div class="card-title">🎭 本次实训角色说明</div>
+    <div class="alert alert-info">
+      💡 本次实训采用"流水线"模式——每位同学完整体验全部5个角色，感受供应链各环节的职责与协作。
+    </div>
+    <div class="role-grid" style="grid-template-columns: repeat(5,1fr)">
+      <div class="role-card">
+        <div class="emoji">🧑‍🌾</div>
+        <div class="role-name">①产地农户</div>
+        <div class="role-desc">录入农产品基础信息，生成溯源码</div>
+      </div>
+      <div class="role-card">
+        <div class="emoji">🔬</div>
+        <div class="role-name">②检测机构</div>
+        <div class="role-desc">对产品质量检测，审核并上链确认</div>
+      </div>
+      <div class="role-card">
+        <div class="emoji">🏭</div>
+        <div class="role-name">③仓储管理员</div>
+        <div class="role-desc">入库扫码、库位分配、出库操作</div>
+      </div>
+      <div class="role-card">
+        <div class="emoji">🚛</div>
+        <div class="role-name">④冷链调度员</div>
+        <div class="role-desc">监控运输全程，处理温控异常</div>
+      </div>
+      <div class="role-card">
+        <div class="emoji">🔍</div>
+        <div class="role-name">⑤溯码查验员</div>
+        <div class="role-desc">查询溯源链路，识别异常批次</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="content-card">
+    <div class="card-title">📦 本次实训产品</div>
+    <div class="alert alert-success">
+      🍎 本次实训追踪产品：<strong>赣南脐橙</strong>（批次号：GN-2024-1101）<br>
+      产地：江西省赣州市信丰县 → 目的地：上海某大型超市
+    </div>
+    <table>
+      <tr><th>环节</th><th>涉及岗位</th><th>核心操作</th><th>学习目标</th></tr>
+      <tr><td>产地录入</td><td>基地管理员</td><td>填写产品信息、上传检测报告</td><td>理解溯源数据的起点与重要性</td></tr>
+      <tr><td>检测上链</td><td>质检员</td><td>审核数据、生成哈希值上链</td><td>理解区块链不可篡改原理</td></tr>
+      <tr><td>仓储管理</td><td>仓管员</td><td>入库、库位分配、出库</td><td>掌握WMS基础操作逻辑</td></tr>
+      <tr><td>冷链运输</td><td>调度员</td><td>监控温度、处理异常事件</td><td>理解冷链管控关键控制点</td></tr>
+      <tr><td>溯码查验</td><td>监管/消费者</td><td>扫码查询、找出异常批次</td><td>体会溯源系统的监管价值</td></tr>
+    </table>
+  </div>
+</div>
+
+<!-- ===== 页面1：产地录入 ===== -->
+<div class="role-page" id="page1">
+  <div class="page-title">🧑‍🌾 角色：产地农户 / 基地管理员</div>
+  <div class="page-subtitle">任务：录入本批次赣南脐橙的完整产地信息，生成溯源码</div>
+
+  <div class="task-hint">
+    📌 任务要求：完整填写下方所有信息后，点击「生成溯源码」提交。系统将为本批次产品生成唯一溯源码。
+  </div>
+
+  <div class="content-card">
+    <div class="card-title">📝 基础产品信息</div>
+    <div class="form-grid">
+      <div class="form-group">
+        <label>产品名称 *</label>
+        <input type="text" id="p_name" value="赣南脐橙" placeholder="如：赣南脐橙">
+      </div>
+      <div class="form-group">
+        <label>品种</label>
+        <input type="text" id="p_variety" value="纽荷尔脐橙" placeholder="品种名称">
+      </div>
+      <div class="form-group">
+        <label>采摘日期 *</label>
+        <input type="date" id="p_harvest_date">
+      </div>
+      <div class="form-group">
+        <label>采摘重量（kg）*</label>
+        <input type="number" id="p_weight" value="2000" placeholder="单位：kg">
+      </div>
+      <div class="form-group">
+        <label>种植基地名称 *</label>
+        <input type="text" id="p_farm" value="信丰县绿源农业合作社" placeholder="基地全称">
+      </div>
+      <div class="form-group">
+        <label>基地负责人</label>
+        <input type="text" id="p_manager" placeholder="姓名">
+      </div>
+      <div class="form-group full">
+        <label>产地地址 *</label>
+        <input type="text" id="p_address" value="江西省赣州市信丰县嘉定镇柑橘产业园" placeholder="详细地址">
+      </div>
+    </div>
+  </div>
+
+  <div class="content-card">
+    <div class="card-title">🌱 种植过程记录</div>
+    <div class="form-grid">
+      <div class="form-group">
+        <label>种植周期（月）</label>
+        <input type="number" id="p_cycle" value="9" placeholder="月份数">
+      </div>
+      <div class="form-group">
+        <label>灌溉方式</label>
+        <select id="p_irrigation">
+          <option>滴灌</option><option>喷灌</option><option>漫灌</option><option>自然降水</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>化肥使用情况</label>
+        <select id="p_fertilizer">
+          <option>有机肥为主（少量复合肥）</option>
+          <option>全有机肥种植</option>
+          <option>复合肥为主</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>农药使用次数</label>
+        <input type="number" id="p_pesticide" value="3" placeholder="次数">
+      </div>
+      <div class="form-group">
+        <label>最后一次农药施用距采摘（天）</label>
+        <input type="number" id="p_pesticide_days" value="21" placeholder="天数">
+      </div>
+      <div class="form-group">
+        <label>土壤检测结果</label>
+        <select id="p_soil">
+          <option>合格（重金属未超标）</option>
+          <option>优良</option>
+          <option>待检</option>
+        </select>
+      </div>
+      <div class="form-group full">
+        <label>备注说明</label>
+        <textarea id="p_note" placeholder="其他需要说明的情况...">本批次橙子经过严格分级筛选，单果重量200-250g，色泽均匀，无明显病虫害痕迹。</textarea>
+      </div>
+    </div>
+  </div>
+
+  <div class="content-card" id="trace_result" style="display:none">
+    <div class="card-title">✅ 溯源码生成成功</div>
+    <div class="alert alert-success">
+      <div>
+        <strong>溯源码已生成！</strong> 本批次产品已进入溯源系统，等待质检机构审核。<br>
+        溯源码：<span id="generated_trace_code" style="font-family:monospace;font-size:16px;font-weight:bold;color:#1a7f3c"></span>
+      </div>
+    </div>
+
+    <!-- 二维码生成区域 -->
+    <div class="qrcode-container" id="qrcode_panel">
+      <div class="card-title" style="justify-content:center">📱 溯源二维码</div>
+      <div id="qrcode_image"></div>
+      <p class="qrcode-tip">
+        微信扫描上方二维码，即可查看溯源信息
+      </p>
+      <div class="qrcode-actions">
+        <button class="btn btn-secondary btn-sm" onclick="downloadQRCode()">⬇️ 保存二维码</button>
+        <button class="btn btn-primary btn-sm" onclick="testScanQRCode()">🔍 模拟扫码预览</button>
+      </div>
+    </div>
+
+    <!-- 微信扫码体验提示 -->
+    <div class="wechat-scan-hint" id="wechat_hint">
+      <span class="icon">📱</span>
+      <span class="text">打开微信扫一扫</span>
+      <span class="sub">扫描上方二维码，体验消费者溯源查询</span>
+    </div>
+
+    <p style="font-size:13px;color:#888;margin-top:16px">📢 请将此溯源码告知下一环节（质检机构），以便进行检测审核。</p>
+  </div>
+</div>
+
+<!-- ===== 页面2：检测上链 ===== -->
+<div class="role-page" id="page2">
+  <div class="page-title">🔬 角色：检测机构 / 质量审核员</div>
+  <div class="page-subtitle">任务：对上一环节提交的产品进行质检，审核合格后上链确认</div>
+
+  <div class="task-hint">
+    📌 任务要求：查看待检产品信息，填写检测数据，理解区块链"哈希上链"的工作原理。
+  </div>
+
+  <div class="content-card">
+    <div class="card-title">📋 待检产品信息</div>
+    <div id="inspect_product_info">
+      <div class="alert alert-info">请先完成「产地录入」环节，产品信息将自动同步至此处。</div>
+    </div>
+  </div>
+
+  <div class="content-card">
+    <div class="card-title">🧪 质量检测录入</div>
+    <div class="form-grid">
+      <div class="form-group">
+        <label>检测机构名称</label>
+        <input type="text" id="ins_agency" value="赣州市农产品质量检测中心" placeholder="机构名称">
+      </div>
+      <div class="form-group">
+        <label>检测员姓名</label>
+        <input type="text" id="ins_inspector" placeholder="您的姓名">
+      </div>
+      <div class="form-group">
+        <label>检测日期</label>
+        <input type="date" id="ins_date">
+      </div>
+      <div class="form-group">
+        <label>农残检测（mg/kg）</label>
+        <input type="number" id="ins_pesticide_val" value="0.03" step="0.01" placeholder="实测值">
+      </div>
+      <div class="form-group">
+        <label>农残国标上限（mg/kg）</label>
+        <input type="number" id="ins_pesticide_std" value="0.05" step="0.01" placeholder="标准上限">
+      </div>
+      <div class="form-group">
+        <label>糖度（°Brix）</label>
+        <input type="number" id="ins_sugar" value="13.5" step="0.1" placeholder="甜度">
+      </div>
+      <div class="form-group">
+        <label>外观评级</label>
+        <select id="ins_appearance">
+          <option value="A">A级（优）</option>
+          <option value="B">B级（良）</option>
+          <option value="C">C级（合格）</option>
+          <option value="D">D级（不合格）</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label>综合检测结论</label>
+        <select id="ins_conclusion">
+          <option value="pass">✅ 合格，准予上链</option>
+          <option value="fail">❌ 不合格，退回产地</option>
+        </select>
+      </div>
+    </div>
+    <div style="margin-top:16px">
+      <button class="btn btn-primary" onclick="generateHash()">🔗 计算哈希值并上链</button>
+    </div>
+  </div>
+
+  <div class="content-card" id="blockchain_panel" style="display:none">
+    <div class="card-title">⛓️ 区块链溯源账本</div>
+    <div class="alert alert-info">
+      💡 <strong>区块链原理演示</strong>：每条记录生成唯一哈希值，与上一区块哈希相连，形成不可篡改的链式结构。
+      尝试修改下方数据，观察哈希值变化。
+    </div>
+    <div class="blockchain-view" id="blockchain_view"></div>
+    <div style="margin-top:16px;display:flex;gap:10px;align-items:center">
+      <button class="btn btn-warning btn-sm" onclick="simulateTamper()">⚠️ 模拟数据篡改</button>
+      <button class="btn btn-secondary btn-sm" onclick="resetTamper()">↩️ 恢复原始数据</button>
+      <span id="tamper_tip" style="font-size:13px;color:#888"></span>
+    </div>
+  </div>
+</div>
+
+<!-- ===== 页面3：仓储管理 ===== -->
+<div class="role-page" id="page3">
+  <div class="page-title">🏭 角色：仓储管理员</div>
+  <div class="page-subtitle">任务：对已检测合格产品进行入库、库位分配，并执行出库操作</div>
+
+  <div class="task-hint">
+    📌 任务要求：完成产品入库扫码→库位分配→出库三个步骤，理解WMS仓储管理系统的核心逻辑。
+  </div>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
+    <div>
+      <div class="content-card">
+        <div class="card-title">📥 入库操作</div>
+        <div class="form-group" style="margin-bottom:12px">
+          <label>扫描/输入溯源码</label>
+          <div style="display:flex;gap:8px">
+            <input type="text" id="wh_scan_code" placeholder="输入溯源码或点击自动填充" style="flex:1">
+            <button class="btn btn-secondary btn-sm" onclick="autoFillCode()">自动填充</button>
+          </div>
+        </div>
+        <div id="wh_product_info" style="display:none;margin-bottom:12px">
+          <div class="alert alert-success" id="wh_info_content"></div>
+        </div>
+        <div class="form-group" style="margin-bottom:12px">
+          <label>入库数量（件）</label>
+          <input type="number" id="wh_qty" value="200" placeholder="件数">
+        </div>
+        <div class="form-group" style="margin-bottom:12px">
+          <label>储存温度要求（℃）</label>
+          <input type="number" id="wh_temp" value="8" placeholder="如：8">
+        </div>
+        <button class="btn btn-primary" onclick="inboundProduct()">📦 确认入库</button>
+      </div>
+
+      <div class="content-card">
+        <div class="card-title">📤 出库操作</div>
+        <div class="form-group" style="margin-bottom:12px">
+          <label>出库原因</label>
+          <select id="wh_outbound_reason">
+            <option>发往冷链运输（正常出库）</option>
+            <option>质量问题退货</option>
+            <option>盘点调拨</option>
+          </select>
+        </div>
+        <div class="form-group" style="margin-bottom:12px">
+          <label>出库数量（件）</label>
+          <input type="number" id="wh_out_qty" value="200" placeholder="件数">
+        </div>
+        <button class="btn btn-primary" onclick="outboundProduct()" id="outbound_btn" disabled>🚛 确认出库</button>
+        <div id="outbound_result" style="margin-top:12px;display:none">
+          <div class="alert alert-success">✅ 出库完成！货物已移交冷链运输环节。</div>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <div class="content-card" style="height:fit-content">
+        <div class="card-title">🗺️ 仓库货位图</div>
+        <p style="font-size:12px;color:#888;margin-bottom:12px">点击空位为入库产品分配库位 | 🟩 已占用 | ⬜ 空闲 | 🟨 临期预警</p>
+        <div class="warehouse-grid" id="warehouse_grid"></div>
+        <div style="margin-top:12px;font-size:13px;color:#555">
+          已选库位：<span id="selected_cell" style="font-weight:bold;color:#1a7f3c">-</span>
+        </div>
+      </div>
+
+      <div class="content-card" style="margin-top:20px">
+        <div class="card-title">📊 库存台账</div>
+        <table id="inventory_table">
+          <tr><th>溯源码</th><th>产品</th><th>库位</th><th>数量</th><th>状态</th></tr>
+          <tr><td colspan="5" style="text-align:center;color:#aaa;padding:20px">暂无库存记录</td></tr>
+        </table>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== 页面4：冷链运输 ===== -->
+<div class="role-page" id="page4">
+  <div class="page-title">🚛 角色：冷链调度员</div>
+  <div class="page-subtitle">任务：监控货物从赣州到上海的全程冷链运输，处理途中突发事件</div>
+
+  <div class="task-hint">
+    📌 任务要求：启动运输后，监控温度变化。当出现温控预警时，需在5分钟内做出正确处置决策。
+  </div>
+
+  <div style="display:grid;grid-template-columns:2fr 1fr;gap:20px">
+    <div>
+      <div class="content-card">
+        <div class="card-title">🗺️ 运输路线监控</div>
+        <!-- SVG地图 -->
+        <div class="map-container">
+          <svg class="map-svg" viewBox="0 0 700 300" id="route_svg">
+            <!-- 背景 -->
+            <rect width="700" height="300" fill="#e8f4e8"/>
+            <!-- 网格 -->
+            <g stroke="#d0e8d0" stroke-width="0.5" opacity="0.5">
+              <line x1="0" y1="60" x2="700" y2="60"/><line x1="0" y1="120" x2="700" y2="120"/>
+              <line x1="0" y1="180" x2="700" y2="180"/><line x1="0" y1="240" x2="700" y2="240"/>
+              <line x1="140" y1="0" x2="140" y2="300"/><line x1="280" y1="0" x2="280" y2="300"/>
+              <line x1="420" y1="0" x2="420" y2="300"/><line x1="560" y1="0" x2="560" y2="300"/>
+            </g>
+            <!-- 运输路线 -->
+            <polyline id="route_line" points="80,220 180,200 260,180 340,160 420,150 520,140 620,130"
+              fill="none" stroke="#1a7f3c" stroke-width="3" stroke-dasharray="8,4" opacity="0.6"/>
+            <!-- 已走路线（动态） -->
+            <polyline id="done_line" points="80,220" fill="none" stroke="#1a7f3c" stroke-width="4"/>
+            <!-- 城市标记 -->
+            <g font-family="Microsoft YaHei" font-size="13" fill="#333">
+              <circle cx="80" cy="220" r="8" fill="#1a7f3c"/>
+              <text x="60" y="245" font-size="12" fill="#1a7f3c" font-weight="bold">赣州</text>
+              <circle cx="260" cy="180" r="5" fill="#888"/>
+              <text x="240" y="200" font-size="11" fill="#666">南昌</text>
+              <circle cx="420" cy="150" r="5" fill="#888"/>
+              <text x="400" y="170" font-size="11" fill="#666">杭州</text>
+              <circle cx="620" cy="130" r="8" fill="#e74c3c"/>
+              <text x="600" y="155" font-size="12" fill="#e74c3c" font-weight="bold">上海</text>
+            </g>
+            <!-- 冷链车图标 -->
+            <g id="truck_icon" transform="translate(80,210)">
+              <rect x="-18" y="-10" width="36" height="20" rx="4" fill="white" stroke="#1a7f3c" stroke-width="2"/>
+              <text x="-6" y="5" font-size="14">🚛</text>
+            </g>
+            <!-- 温度图标 -->
+            <text id="temp_display" x="350" y="50" font-size="14" fill="#1976d2" font-weight="bold" text-anchor="middle">🌡️ 7.5°C</text>
+          </svg>
+        </div>
+      </div>
+
+      <!-- 事件日志 -->
+      <div class="content-card">
+        <div class="card-title">📋 运输事件日志</div>
+        <div id="event_log" style="max-height:200px;overflow-y:auto">
+          <div style="color:#aaa;font-size:13px;text-align:center;padding:20px">运输启动后将显示事件记录</div>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <!-- 运输信息 -->
+      <div class="content-card">
+        <div class="card-title">📦 运输信息</div>
+        <table style="font-size:13px">
+          <tr><td style="color:#888;padding:6px 8px">货物批次</td><td id="t_batch">GN-2024-1101</td></tr>
+          <tr><td style="color:#888;padding:6px 8px">出发城市</td><td>赣州</td></tr>
+          <tr><td style="color:#888;padding:6px 8px">目的城市</td><td>上海</td></tr>
+          <tr><td style="color:#888;padding:6px 8px">运输距离</td><td>约1,050 km</td></tr>
+          <tr><td style="color:#888;padding:6px 8px">要求温度</td><td>4~10°C</td></tr>
+          <tr><td style="color:#888;padding:6px 8px">运输状态</td><td><span class="badge badge-blue" id="transport_status">待出发</span></td></tr>
+          <tr><td style="color:#888;padding:6px 8px">当前温度</td><td><span id="curr_temp_text" style="font-weight:bold;color:#1a7f3c">-</span></td></tr>
+          <tr><td style="color:#888;padding:6px 8px">运输进度</td><td><span id="transport_pct">0%</span></td></tr>
+        </table>
+        <div style="margin-top:16px">
+          <button class="btn btn-primary" id="start_transport_btn" onclick="startTransport()">🚀 启动运输</button>
+        </div>
+      </div>
+
+      <!-- 温度曲线 -->
+      <div class="content-card">
+        <div class="card-title">🌡️ 实时温度曲线</div>
+        <canvas id="temp_chart" width="280" height="160" style="width:100%"></canvas>
+        <div style="margin-top:8px;font-size:12px;color:#888;text-align:center">
+          绿色区域为安全温度范围（4~10°C）
+        </div>
+      </div>
+
+      <!-- 异常处置 -->
+      <div class="content-card" id="alert_panel" style="display:none">
+        <div class="card-title">⚠️ 异常预警处置</div>
+        <div class="alert alert-warning" id="alert_msg"></div>
+        <div style="display:flex;flex-direction:column;gap:8px;margin-top:12px">
+          <button class="btn btn-primary btn-sm" onclick="handleAlert('repair')">🔧 联系司机调整制冷设备</button>
+          <button class="btn btn-warning btn-sm" onclick="handleAlert('transfer')">🔄 就近转仓，更换车辆</button>
+          <button class="btn btn-danger btn-sm" onclick="handleAlert('report')">📞 上报质量安全事件</button>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== 页面5：溯码查验 ===== -->
+<div class="role-page" id="page5">
+  <div class="page-title">🔍 角色：溯码查验员（监管人员/消费者）</div>
+  <div class="page-subtitle">任务：通过溯源码查询产品全链路信息，识别其中的异常批次</div>
+
+  <div class="task-hint">
+    📌 任务要求：查询下方3个批次的溯源信息，找出有问题的批次并指出异常节点。<br>
+    💡 <strong>新增功能</strong>：也可以使用「我的溯源二维码」展示自己的产品，让学生互相扫码查询！
+  </div>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
+    <div>
+      <!-- 我的溯源二维码卡片 -->
+      <div class="content-card" id="my_qrcode_card">
+        <div class="card-title">📱 我的溯源二维码（展示给同学扫码）</div>
+        <div class="alert alert-success">
+          <strong>📢 请展示此二维码让同学用微信扫码！</strong><br>
+          扫描后可直接查看你的产品溯源信息，体验真实的消费者溯源查询场景。
+        </div>
+        <div id="my_qrcode_display" style="text-align:center;margin:16px 0">
+          <div style="padding:40px;color:#888">正在生成二维码...</div>
+        </div>
+        <div style="text-align:center;margin-top:12px">
+          <span id="my_trace_code" style="font-family:monospace;font-size:14px;color:#1a7f3c;font-weight:bold"></span>
+        </div>
+      </div>
+
+      <div class="content-card">
+        <div class="card-title">🔎 溯源码查询</div>
+        <div class="trace-search">
+          <input type="text" id="query_code" placeholder="输入溯源码，如：GN-2024-1101" class="form-group input" style="flex:1;border:1.5px solid #ddd;border-radius:8px;padding:9px 12px;font-size:14px">
+          <button class="btn btn-primary" onclick="queryTrace()">查询</button>
+        </div>
+        <div style="margin-bottom:16px">
+          <p style="font-size:13px;color:#888;margin-bottom:8px">可查询的示例批次（点击直接填入）：</p>
+          <div style="display:flex;flex-wrap:wrap;gap:8px">
+            <button class="btn btn-secondary btn-sm" onclick="fillCode('GN-2024-1101')">GN-2024-1101</button>
+            <button class="btn btn-secondary btn-sm" onclick="fillCode('HN-2024-0923')">HN-2024-0923</button>
+            <button class="btn btn-secondary btn-sm" onclick="fillCode('SD-2024-1005')">SD-2024-1005</button>
+          </div>
+        </div>
+        <div id="query_result"></div>
+      </div>
+
+      <div class="content-card">
+        <div class="card-title">📝 查验记录表</div>
+        <table id="verify_table">
+          <tr><th>批次号</th><th>产品</th><th>查验结果</th><th>异常节点</th></tr>
+          <tr><td colspan="4" style="text-align:center;color:#aaa;padding:16px">暂无查验记录</td></tr>
+        </table>
+      </div>
+    </div>
+
+    <div>
+      <div class="content-card">
+        <div class="card-title">🧩 溯源链路详情</div>
+        <div id="trace_timeline_view">
+          <div style="color:#aaa;font-size:13px;text-align:center;padding:30px">
+            请输入溯源码进行查询
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ===== 页面6：实训总结 ===== -->
+<div class="role-page" id="page6">
+  <div class="page-title">📊 实训总结与评分</div>
+  <div class="page-subtitle">恭喜完成本次溯源实训全流程！请填写实训反思并查看得分</div>
+
+  <div style="display:grid;grid-template-columns:1fr 1fr;gap:20px">
+    <div>
+      <div class="content-card">
+        <div class="card-title">📈 本次实训完成情况</div>
+        <table id="summary_table">
+          <tr><th>环节</th><th>完成状态</th><th>得分</th></tr>
+          <tr><td>产地信息录入</td><td id="s1_status"><span class="badge badge-blue">待评</span></td><td id="s1_score">-</td></tr>
+          <tr><td>检测上链操作</td><td id="s2_status"><span class="badge badge-blue">待评</span></td><td id="s2_score">-</td></tr>
+          <tr><td>仓储入库/出库</td><td id="s3_status"><span class="badge badge-blue">待评</span></td><td id="s3_score">-</td></tr>
+          <tr><td>冷链运输监控</td><td id="s4_status"><span class="badge badge-blue">待评</span></td><td id="s4_score">-</td></tr>
+          <tr><td>溯码查验（找出异常）</td><td id="s5_status"><span class="badge badge-blue">待评</span></td><td id="s5_score">-</td></tr>
+          <tr style="background:#f0faf4"><td><strong>总计</strong></td><td></td><td id="total_score" style="font-weight:bold;color:#1a7f3c">-</td></tr>
+        </table>
+        <div style="margin-top:16px">
+          <button class="btn btn-primary" onclick="calcScore()">📊 生成评分报告</button>
+        </div>
+      </div>
+
+      <div class="content-card" id="score_result_panel" style="display:none">
+        <div class="result-panel">
+          <div class="score" id="final_score_display">-</div>
+          <div class="score-label">实训综合得分（满分100）</div>
+          <div style="margin-top:16px;font-size:14px;opacity:0.9" id="score_comment"></div>
+        </div>
+      </div>
+    </div>
+
+    <div>
+      <div class="content-card">
+        <div class="card-title">✍️ 实训反思</div>
+        <div class="form-group" style="margin-bottom:14px">
+          <label>1. 区块链"哈希上链"的意义是什么？（用自己的话描述）</label>
+          <textarea id="reflect1" placeholder="请在此填写您的理解..." style="min-height:80px"></textarea>
+        </div>
+        <div class="form-group" style="margin-bottom:14px">
+          <label>2. 冷链运输中最关键的控制点是什么？为什么？</label>
+          <textarea id="reflect2" placeholder="请在此填写您的理解..." style="min-height:80px"></textarea>
+        </div>
+        <div class="form-group" style="margin-bottom:14px">
+          <label>3. 如果你是企业管理者，会在哪个环节优先建设数字化系统？理由是什么？</label>
+          <textarea id="reflect3" placeholder="请在此填写您的理解..." style="min-height:80px"></textarea>
+        </div>
+      </div>
+
+      <div class="content-card">
+        <div class="card-title">🏆 知识点回顾</div>
+        <div style="display:flex;flex-direction:column;gap:10px">
+          <div class="alert alert-success">
+            <div><strong>溯源码</strong>：为每批次产品生成唯一标识，可追溯生产全流程</div>
+          </div>
+          <div class="alert alert-info">
+            <div><strong>区块链哈希</strong>：数据一旦上链，修改任何字段都会导致哈希不匹配，保障数据真实性</div>
+          </div>
+          <div class="alert alert-warning">
+            <div><strong>冷链关键控制点</strong>：温度偏离>2°C超过30分钟，会导致果品损耗加速</div>
+          </div>
+          <div class="alert alert-success">
+            <div><strong>先进先出（FIFO）</strong>：先入库的产品应先出库，避免过期损耗</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+</div><!-- /main -->
+
+<!-- 底部操作栏 -->
+<div class="action-bar">
+  <div style="font-size:13px;color:#888" id="step_hint">第1步：填写学生信息，开始实训</div>
+  <div style="display:flex;gap:10px">
+    <button class="btn btn-secondary" id="prev_btn" onclick="prevStep()" style="display:none">← 上一步</button>
+    <button class="btn btn-primary" id="next_btn" onclick="nextStep()">开始实训 →</button>
+  </div>
+</div>
+
+<!-- 弹窗 -->
+<div class="modal-overlay" id="modal">
+  <div class="modal">
+    <div class="modal-title" id="modal_title">提示</div>
+    <div class="modal-body" id="modal_body"></div>
+    <div class="modal-actions">
+      <button class="btn btn-primary" onclick="closeModal()">确定</button>
+    </div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/qrcode@1.5.1/build/qrcode.min.js"></script>
+<script>
+// ============ 全局状态 ============
+const state = {
+  currentStep: 0,
+  studentName: '',
+  studentId: '',
+  className: '',
+  traceCode: '',
+  productData: null,
+  inspectionData: null,
+  blockchainData: [],
+  warehouseData: null,
+  selectedCell: null,
+  transportStarted: false,
+  transportTimer: null,
+  transportProgress: 0,
+  tempHistory: [],
+  alertHandled: false,
+  alertTriggered: false,
+  verifyRecords: [],
+  completedSteps: new Set(),
+  scores: {}
+};
+
+// 初始化日期
+document.getElementById('p_harvest_date').value = new Date().toISOString().split('T')[0];
+document.getElementById('ins_date').value = new Date().toISOString().split('T')[0];
+document.getElementById('trainDate').value = new Date().toISOString().split('T')[0];
+
+// ============ 步骤导航 ============
+function goToStep(n) {
+  // 通过顶部进度条点击时，只允许跳转到已完成的步骤或当前步骤
+  // nextStep() 内部调用时不受此限制（由 _fromButton 参数控制）
+  if (arguments[1] !== true && n > state.currentStep) return;
+  document.querySelectorAll('.role-page').forEach(p => p.classList.remove('active'));
+  document.getElementById('page' + n).classList.add('active');
+  document.querySelectorAll('.step').forEach((s, i) => {
+    s.classList.remove('active', 'done');
+    if (i < n) s.classList.add('done');
+    if (i === n) s.classList.add('active');
+  });
+  document.querySelectorAll('.step-line').forEach((l, i) => {
+    l.classList.toggle('done', i < n);
+  });
+  state.currentStep = n;
+  updateActionBar();
+
+  // 如果进入溯码查验页面（步骤5），自动生成二维码展示
+  if (n === 5) {
+    // 如果没有溯源码，使用默认的示例溯源码
+    if (!state.traceCode) {
+      state.traceCode = 'GN-2024-1101'; // 默认溯源码
+    }
+    setTimeout(generateMyQRCode, 100);
+  }
+}
+
+function nextStep() {
+  if (!validateCurrentStep()) return;
+  state.completedSteps.add(state.currentStep);
+  if (state.currentStep === 0) initStudentSession();
+  if (state.currentStep === 1) onProductSubmit();
+  if (state.currentStep === 2) onInspectionDone();
+  if (state.currentStep === 3) onWarehouseDone();
+  goToStep(state.currentStep + 1, true); // true 表示由按钮触发，允许前进
+}
+
+function prevStep() {
+  if (state.currentStep > 0) goToStep(state.currentStep - 1, true);
+}
+
+function updateActionBar() {
+  const hints = [
+    '第1步：填写学生信息，了解实训流程',
+    '第2步：扮演产地农户，录入产品信息并生成溯源码',
+    '第3步：扮演质检机构，完成检测并上链',
+    '第4步：扮演仓储管理员，完成入库和出库操作',
+    '第5步：扮演冷链调度员，监控运输并处理异常',
+    '第6步：扮演溯码查验员，查询并识别异常批次',
+    '最后一步：查看评分，完成实训反思',
+  ];
+  document.getElementById('step_hint').textContent = hints[state.currentStep] || '';
+  document.getElementById('prev_btn').style.display = state.currentStep > 0 ? 'block' : 'none';
+  const nextTexts = ['开始实训 →', '提交产品信息 →', '完成上链，进入仓储 →', '完成仓储，启动运输 →', '完成运输监控 →', '完成查验 →', '提交实训报告'];
+  document.getElementById('next_btn').textContent = nextTexts[state.currentStep] || '下一步 →';
+  if (state.currentStep === 6) {
+    document.getElementById('next_btn').style.display = 'none';
+  }
+}
+
+function validateCurrentStep() {
+  if (state.currentStep === 0) {
+    if (!document.getElementById('studentName').value.trim()) {
+      showModal('提示', '请填写您的姓名后再开始实训。'); return false;
+    }
+  }
+  if (state.currentStep === 1) {
+    const name = document.getElementById('p_name').value;
+    const farm = document.getElementById('p_farm').value;
+    if (!name || !farm) {
+      showModal('提示', '请至少填写产品名称和种植基地名称。'); return false;
+    }
+    // 若溯源码尚未生成，先生成并显示，让学生看到后再允许下一步
+    if (!state.productData) {
+      submitProduct();
+      showModal('溯源码生成成功', '✅ 溯源码已生成：' + state.traceCode + '\n\n请记录此溯源码，然后点击「提交产品信息」进入下一环节。');
+      return false; // 本次点击仅生成溯源码，不跳转；学生再点一次才跳转
+    }
+  }
+  if (state.currentStep === 2) {
+    if (!state.blockchainData.length) {
+      showModal('提示', '请先完成检测并执行「计算哈希值并上链」操作。'); return false;
+    }
+  }
+  if (state.currentStep === 3) {
+    if (!state.warehouseData) {
+      showModal('提示', '请先完成入库和出库操作。'); return false;
+    }
+  }
+  if (state.currentStep === 4) {
+    if (!state.transportStarted) {
+      showModal('提示', '请先点击「启动运输」，完成运输监控环节。'); return false;
+    }
+  }
+  return true;
+}
+
+// ============ 步骤0：初始化学生会话 ============
+function initStudentSession() {
+  state.studentName = document.getElementById('studentName').value;
+  state.studentId = document.getElementById('studentId').value;
+  state.className = document.getElementById('className').value;
+  document.getElementById('sessionInfo').textContent =
+    `实训室：供应链管理实训室 | 班级：${state.className || '未填写'} | 姓名：${state.studentName}`;
+}
+
+// ============ 步骤1：产地录入 ============
+function submitProduct() {
+  const code = 'GN-' + new Date().getFullYear() + '-' + Math.floor(Math.random()*9000+1000);
+  state.traceCode = 'GN-2024-1101'; // 固定批次号便于后续查验
+  state.productData = {
+    name: document.getElementById('p_name').value,
+    variety: document.getElementById('p_variety').value,
+    harvestDate: document.getElementById('p_harvest_date').value,
+    weight: document.getElementById('p_weight').value,
+    farm: document.getElementById('p_farm').value,
+    address: document.getElementById('p_address').value,
+    manager: document.getElementById('p_manager').value,
+    fertilizer: document.getElementById('p_fertilizer').value,
+    pesticide: document.getElementById('p_pesticide').value,
+    pesticideDays: document.getElementById('p_pesticide_days').value,
+    note: document.getElementById('p_note').value,
+    traceCode: state.traceCode,
+    submitTime: new Date().toLocaleString()
+  };
+  document.getElementById('generated_trace_code').textContent = state.traceCode;
+  document.getElementById('trace_result').style.display = 'block';
+
+  // 生成二维码
+  generateQRCode(state.traceCode);
+}
+
+// 生成溯源二维码
+// 生成溯源二维码（使用在线API）
+function generateQRCode(traceCode) {
+  const container = document.getElementById('qrcode_image');
+  container.innerHTML = ''; // 清空之前的二维码
+
+  // 构建溯源链路详情
+  const productName = state.productData?.name || '赣南脐橙';
+  const variety = state.productData?.variety || '纽荷尔脐橙';
+  const farm = state.productData?.farm || '信丰县绿源农业合作社';
+  const harvestDate = state.productData?.harvestDate || '2024-11-01';
+  const weight = state.productData?.weight || '2000';
+
+  const traceInfo = `【农产品溯源信息】📦${productName} 🌱${variety} 📍${farm} 📅${harvestDate} ⚖️${weight}kg 🔖${traceCode}`;
+
+  // 使用 QRServer API 生成二维码
+  const qrUrl = 'https://api.qrserver.com/v1/create-qr-code/?size=140x140&data=' + encodeURIComponent(traceInfo);
+
+  container.innerHTML = `
+    <div style="background:white;padding:8px;border-radius:8px;display:inline-block;box-shadow:0 2px 8px rgba(0,0,0,0.08);margin:8px 0">
+      <img src="${qrUrl}" alt="溯源二维码" style="width:140px;height:140px;display:block" onerror="this.parentElement.style.display='none'">
+    </div>
+  `;
+}
+
+// 下载二维码
+function downloadQRCode() {
+  // 尝试获取canvas或img元素
+  const container = document.getElementById('qrcode_image');
+  const canvas = container.querySelector('canvas');
+  const img = container.querySelector('img');
+
+  if (!canvas && !img) {
+    showModal('提示', '请先生成二维码');
+    return;
+  }
+
+  let url;
+  if (canvas) {
+    url = canvas.toDataURL('image/png');
+  } else {
+    url = img.src;
+  }
+
+  // 导出为图片
+  const link = document.createElement('a');
+  link.download = '溯源码_' + state.traceCode + '.png';
+  link.href = url;
+  link.click();
+
+  showModal('下载成功', '二维码已保存为 PNG 图片。\n\n在真实场景中，学生可以将此二维码打印贴到产品包装上，消费者扫码即可查询溯源信息。');
+}
+
+// 模拟扫码预览（演示消费者看到的页面）
+function testScanQRCode() {
+  if (!state.traceCode) {
+    showModal('提示', '请先生成溯源码');
+    return;
+  }
+
+  // 模拟手机端显示效果
+  const previewHtml = `
+    <div style="max-width:320px;margin:0 auto;padding:16px;background:#f5f5f5;border-radius:12px">
+      <div style="background:white;border-radius:12px;padding:16px;margin-bottom:12px">
+        <div style="text-align:center;margin-bottom:16px">
+          <span style="font-size:40px">🍊</span>
+        </div>
+        <div style="text-align:center;font-size:18px;font-weight:bold;color:#1a7f3c;margin-bottom:8px">
+          赣南脐橙
+        </div>
+        <div style="text-align:center;font-size:13px;color:#888;margin-bottom:16px">
+          批次：${state.traceCode}
+        </div>
+        <div style="background:#f0faf4;border-radius:8px;padding:12px;margin-bottom:12px">
+          <div style="font-size:13px;color:#1a7f3c;font-weight:bold;margin-bottom:8px">✅ 溯源信息</div>
+          <div style="font-size:12px;color:#555;line-height:1.8">
+            <div>📍 产地：${state.productData?.farm || '信丰县绿源农业合作社'}</div>
+            <div>📅 采摘日期：${state.productData?.harvestDate || '2024-11-01'}</div>
+            <div>⚖️ 重量：${state.productData?.weight || '2000'} kg</div>
+            <div>🏭 品种：${state.productData?.variety || '纽荷尔脐橙'}</div>
+          </div>
+        </div>
+        <div style="background:#fff3e0;border-radius:8px;padding:12px">
+          <div style="font-size:13px;color:#f39c12;font-weight:bold;margin-bottom:4px">⚠️ 温馨提示</div>
+          <div style="font-size:12px;color:#888">
+            本产品已通过质量检测，溯源信息真实可靠
+          </div>
+        </div>
+      </div>
+      <div style="text-align:center;font-size:12px;color:#aaa">
+        农产品全链条溯源系统
+      </div>
+    </div>
+  `;
+
+  // 显示预览弹窗
+  const modal = document.getElementById('modal');
+  document.getElementById('modal_title').textContent = '📱 扫码预览效果';
+  document.getElementById('modal_body').innerHTML = previewHtml;
+  document.querySelector('.modal-actions').innerHTML =
+    '<button class="btn btn-secondary" onclick="closeModal()">关闭</button>' +
+    '<button class="btn btn-primary" onclick="goToStep(5,true)">查看完整溯源链路 →</button>';
+  modal.classList.add('show');
+}
+
+function onProductSubmit() {
+  // 同步产品信息到检测页面
+  if (state.productData) {
+    document.getElementById('inspect_product_info').innerHTML = `
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;font-size:13px">
+        <div><span style="color:#888">溯源码：</span><strong style="color:#1a7f3c">${state.productData.traceCode}</strong></div>
+        <div><span style="color:#888">产品名称：</span>${state.productData.name}（${state.productData.variety}）</div>
+        <div><span style="color:#888">采摘日期：</span>${state.productData.harvestDate}</div>
+        <div><span style="color:#888">重量：</span>${state.productData.weight} kg</div>
+        <div><span style="color:#888">产地：</span>${state.productData.farm}</div>
+        <div><span style="color:#888">农残安全期：</span>${state.productData.pesticideDays} 天前最后施药</div>
+      </div>
+    `;
+  }
+}
+
+// ============ 步骤2：检测上链 ============
+async function generateHash() {
+  const inspector = document.getElementById('ins_inspector').value || state.studentName;
+  const pestVal = parseFloat(document.getElementById('ins_pesticide_val').value);
+  const pestStd = parseFloat(document.getElementById('ins_pesticide_std').value);
+  const conclusion = document.getElementById('ins_conclusion').value;
+
+  if (conclusion === 'fail') {
+    showModal('检测不合格', '该批次产品检测不合格，已标记退回产地。实际操作中此批次将不得上链，请选择"合格，准予上链"继续实训。');
+    return;
+  }
+
+  // 构建区块数据
+  const genesisData = { blockId: 0, type: '创世块', content: '农产品溯源链-赣南脐橙专属链', prevHash: '0000000000000000' };
+  const productBlock = {
+    blockId: 1, type: '产地信息',
+    content: `${state.productData?.name || '赣南脐橙'} | ${state.productData?.farm || '信丰县绿源合作社'} | ${state.productData?.harvestDate || '2024-11-01'}`,
+    prevHash: ''
+  };
+  const inspectionBlock = {
+    blockId: 2, type: '质检数据',
+    content: `农残${pestVal}mg/kg（标准≤${pestStd}）| 糖度${document.getElementById('ins_sugar').value}°Brix | ${inspector}`,
+    prevHash: ''
+  };
+
+  // 计算哈希
+  genesisData.hash = await simpleHash(JSON.stringify(genesisData));
+  productBlock.prevHash = genesisData.hash;
+  productBlock.hash = await simpleHash(JSON.stringify(productBlock));
+  inspectionBlock.prevHash = productBlock.hash;
+  inspectionBlock.hash = await simpleHash(JSON.stringify(inspectionBlock));
+
+  state.blockchainData = [genesisData, productBlock, inspectionBlock];
+  state.inspectionData = { inspector, pestVal, pestStd, sugar: document.getElementById('ins_sugar').value, conclusion };
+
+  renderBlockchain();
+  document.getElementById('blockchain_panel').style.display = 'block';
+}
+
+async function simpleHash(str) {
+  // 使用 Web Crypto API 计算 SHA-256
+  if (window.crypto && window.crypto.subtle) {
+    try {
+      const buf = await window.crypto.subtle.digest('SHA-256', new TextEncoder().encode(str));
+      return Array.from(new Uint8Array(buf)).map(b => b.toString(16).padStart(2, '0')).join('').substring(0, 32);
+    } catch(e) {}
+  }
+  // 降级简单哈希
+  let hash = 0;
+  for (let i = 0; i < str.length; i++) {
+    hash = ((hash << 5) - hash) + str.charCodeAt(i);
+    hash |= 0;
+  }
+  return Math.abs(hash).toString(16).padStart(16, '0') + Math.abs(hash * 31).toString(16).padStart(16, '0');
+}
+
+function renderBlockchain(tampered = false, tamperedId = -1) {
+  const view = document.getElementById('blockchain_view');
+  view.innerHTML = '';
+  state.blockchainData.forEach((block, idx) => {
+    const isTampered = tampered && block.blockId >= tamperedId;
+    if (idx > 0) {
+      const arrow = document.createElement('div');
+      arrow.className = 'block-arrow';
+      arrow.textContent = '→';
+      view.appendChild(arrow);
+    }
+    const el = document.createElement('div');
+    el.className = 'block' + (isTampered ? ' tampered' : '');
+    el.innerHTML = `
+      <div class="block-header">区块 #${block.blockId} · ${block.type}</div>
+      <div class="block-data">${block.content}</div>
+      <div class="hash-label">前块哈希</div>
+      <div class="block-hash">${block.prevHash.substring(0,16)}...</div>
+      <div class="hash-label" style="margin-top:6px">本块哈希</div>
+      <div class="block-hash">${isTampered && block.blockId === tamperedId ? '⚠️ <span style="color:#e74c3c">哈希已变！</span>' : block.hash.substring(0,16) + '...'}</div>
+    `;
+    view.appendChild(el);
+  });
+}
+
+let isTampered = false;
+function simulateTamper() {
+  isTampered = true;
+  document.getElementById('tamper_tip').textContent = '⚠️ 已篡改第1号区块的农残数据，观察哈希变化！';
+  renderBlockchain(true, 1);
+}
+function resetTamper() {
+  isTampered = false;
+  document.getElementById('tamper_tip').textContent = '✅ 已恢复原始数据，哈希重新匹配。';
+  renderBlockchain(false);
+}
+
+function onInspectionDone() {
+  // 同步溯源码到仓储
+  document.getElementById('wh_scan_code').placeholder = `输入溯源码 ${state.traceCode}`;
+}
+
+// ============ 步骤3：仓储管理 ============
+// 初始化货架
+(function initWarehouse() {
+  const grid = document.getElementById('warehouse_grid');
+  const preOccupied = [2, 5, 9, 13, 17, 21];
+  for (let i = 0; i < 32; i++) {
+    const cell = document.createElement('div');
+    cell.className = 'shelf-cell' + (preOccupied.includes(i) ? ' occupied warning' : '');
+    cell.dataset.id = i;
+    cell.innerHTML = preOccupied.includes(i) ? '📦' : String.fromCharCode(65 + Math.floor(i/8)) + (i%8+1);
+    if (!preOccupied.includes(i)) {
+      cell.onclick = () => selectCell(i, cell);
+    }
+    grid.appendChild(cell);
+  }
+})();
+
+function selectCell(id, el) {
+  document.querySelectorAll('.shelf-cell').forEach(c => c.classList.remove('selected'));
+  el.classList.add('selected');
+  state.selectedCell = id;
+  const row = String.fromCharCode(65 + Math.floor(id/8));
+  const col = id % 8 + 1;
+  document.getElementById('selected_cell').textContent = `${row}${col}区`;
+}
+
+function autoFillCode() {
+  document.getElementById('wh_scan_code').value = state.traceCode || 'GN-2024-1101';
+  scanProduct();
+}
+
+function scanProduct() {
+  const code = document.getElementById('wh_scan_code').value;
+  if (code === state.traceCode || code === 'GN-2024-1101') {
+    document.getElementById('wh_product_info').style.display = 'block';
+    document.getElementById('wh_info_content').innerHTML =
+      `✅ 扫码成功！产品：<strong>${state.productData?.name || '赣南脐橙'}</strong> | 批次：${code} | 质检：<span class="badge badge-green">合格</span>`;
+  }
+}
+
+document.getElementById('wh_scan_code').addEventListener('change', scanProduct);
+
+function inboundProduct() {
+  const code = document.getElementById('wh_scan_code').value || state.traceCode;
+  if (!state.selectedCell && state.selectedCell !== 0) {
+    showModal('提示', '请先在右侧货架图中点击选择库位。'); return;
+  }
+  const row = String.fromCharCode(65 + Math.floor(state.selectedCell/8));
+  const col = state.selectedCell % 8 + 1;
+  const location = `${row}${col}区`;
+  const qty = document.getElementById('wh_qty').value;
+
+  // 更新货架
+  const cells = document.querySelectorAll('.shelf-cell');
+  cells[state.selectedCell].classList.add('occupied');
+  cells[state.selectedCell].innerHTML = '🍊';
+  cells[state.selectedCell].onclick = null;
+
+  // 更新库存台账
+  const table = document.getElementById('inventory_table');
+  table.innerHTML = `<tr><th>溯源码</th><th>产品</th><th>库位</th><th>数量</th><th>状态</th></tr>`;
+  const row2 = document.createElement('tr');
+  row2.innerHTML = `<td style="font-family:monospace">${code}</td><td>赣南脐橙</td><td><strong>${location}</strong></td><td>${qty}件</td><td><span class="badge badge-green">已入库</span></td>`;
+  table.appendChild(row2);
+
+  state.warehouseData = { code, location, qty };
+  document.getElementById('outbound_btn').disabled = false;
+  showModal('入库成功', `✅ 产品已成功入库至 ${location}，共 ${qty} 件。\n\n请继续完成出库操作，将货物移交冷链运输。`);
+}
+
+function outboundProduct() {
+  const outQty = document.getElementById('wh_out_qty').value;
+  document.getElementById('outbound_result').style.display = 'block';
+  // 更新台账状态
+  const tds = document.querySelectorAll('#inventory_table td');
+  if (tds.length > 4) tds[4].innerHTML = '<span class="badge badge-orange">已出库</span>';
+  state.warehouseData.outbound = true;
+}
+
+function onWarehouseDone() {
+  document.getElementById('t_batch').textContent = state.traceCode || 'GN-2024-1101';
+  // 检查是否有溯源码，如果有则生成二维码
+  if (state.traceCode) {
+    generateMyQRCode();
+  }
+}
+
+// 生成并显示我的溯源二维码
+function generateMyQRCode() {
+  const container = document.getElementById('my_qrcode_display');
+  const code = state.traceCode || 'GN-2024-1101';
+
+  // 构建溯源链路详情文本
+  const productName = state.productData?.name || '赣南脐橙';
+  const variety = state.productData?.variety || '纽荷尔脐橙';
+  const farm = state.productData?.farm || '信丰县绿源农业合作社';
+  const harvestDate = state.productData?.harvestDate || '2024-11-01';
+  const weight = state.productData?.weight || '2000';
+  const address = state.productData?.address || '江西省赣州市信丰县';
+  const manager = state.productData?.manager || '张农户';
+
+  // 溯源链路详情（简化版，微信扫码后显示的文本）
+  const traceInfo = `【农产品溯源信息】📦${productName} 🌱${variety} 📍${farm} 📅${harvestDate} ⚖️${weight}kg 🔖${code}`;
+
+  // 显示溯源码
+  document.getElementById('my_trace_code').textContent = '溯源码：' + code;
+
+  // 使用 QRServer API 生成二维码
+  const qrUrl = 'https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=' + encodeURIComponent(traceInfo);
+
+  container.innerHTML = `
+    <div style="background:white;padding:12px;border-radius:12px;display:inline-block;box-shadow:0 4px 12px rgba(0,0,0,0.1);margin:8px 0">
+      <img src="${qrUrl}" alt="溯源二维码" style="width:180px;height:180px;display:block" onerror="this.parentElement.style.display='none'">
+    </div>
+    <p style="margin-top:12px;font-size:13px;color:#666">
+      📱 <strong>请用微信扫一扫扫描此二维码</strong>
+    </p>
+  `;
+}
+
+// ============ 步骤4：冷链运输 ============
+const routePoints = [[80,220],[180,200],[260,180],[340,160],[420,150],[520,140],[620,130]];
+let tempData = [];
+let eventsDone = new Set();
+
+function startTransport() {
+  if (state.transportStarted) return;
+  state.transportStarted = true;
+  document.getElementById('start_transport_btn').disabled = true;
+  document.getElementById('transport_status').textContent = '运输中';
+  document.getElementById('transport_status').className = 'badge badge-green';
+
+  addEvent('🚀', '货车从赣州出发，初始温度 7.5°C，状态正常');
+  let progress = 0;
+  const totalSteps = 60;
+
+  const timer = setInterval(() => {
+    progress++;
+    state.transportProgress = progress / totalSteps;
+
+    // 生成温度（带随机波动）
+    let temp = 7.5;
+    if (progress < 15) temp = 7.5 + (Math.random() - 0.5) * 1;
+    else if (progress < 25) temp = 7.8 + (Math.random() - 0.5) * 0.8;
+    else if (progress >= 30 && progress <= 38) temp = 12 + Math.random() * 2; // 异常段
+    else if (progress < 50) temp = 7.2 + (Math.random() - 0.5) * 1.2;
+    else temp = 7.0 + (Math.random() - 0.5) * 0.8;
+    temp = Math.round(temp * 10) / 10;
+    tempData.push(temp);
+
+    // 更新显示
+    const pct = Math.round(progress / totalSteps * 100);
+    document.getElementById('transport_pct').textContent = pct + '%';
+    document.getElementById('curr_temp_text').textContent = temp + '°C';
+    document.getElementById('curr_temp_text').style.color = temp > 10 ? '#e74c3c' : temp < 4 ? '#1976d2' : '#1a7f3c';
+    document.getElementById('temp_display').textContent = `🌡️ ${temp}°C`;
+    document.getElementById('temp_display').style.fill = temp > 10 ? '#e74c3c' : '#1976d2';
+
+    // 更新卡车位置
+    const ptIdx = Math.min(Math.floor(state.transportProgress * (routePoints.length - 1)), routePoints.length - 1);
+    const pt = routePoints[ptIdx];
+    document.getElementById('truck_icon').setAttribute('transform', `translate(${pt[0]},${pt[1]-10})`);
+
+    // 已走路线
+    const donePts = routePoints.slice(0, ptIdx + 1).map(p => p.join(',')).join(' ');
+    document.getElementById('done_line').setAttribute('points', donePts);
+
+    // 事件触发
+    if (progress === 20 && !eventsDone.has('checkpoint1')) {
+      eventsDone.add('checkpoint1');
+      addEvent('✅', '经过南昌检查站，温度 7.8°C，货物完好');
+    }
+    if (progress === 30 && !eventsDone.has('alert')) {
+      eventsDone.add('alert');
+      addEvent('⚠️', '【预警】制冷设备故障！温度升至 12.3°C，超过上限 10°C！');
+      showAlert('制冷设备故障，当前温度 12.3°C（安全上限 10°C）。请在5分钟内选择处置方案！');
+    }
+    if (progress === 50 && !eventsDone.has('checkpoint2')) {
+      eventsDone.add('checkpoint2');
+      addEvent('✅', '经过杭州，温度已恢复正常，货物状态良好');
+    }
+    if (progress >= totalSteps) {
+      clearInterval(timer);
+      addEvent('🎉', '货物已安全抵达上海目的地，全程溯源记录完整');
+      document.getElementById('transport_status').textContent = '已到达';
+      document.getElementById('transport_status').className = 'badge badge-green';
+    }
+
+    drawTempChart();
+  }, 300); // 每300ms一步，约18秒跑完
+}
+
+function addEvent(icon, msg) {
+  const log = document.getElementById('event_log');
+  const time = new Date().toLocaleTimeString();
+  const item = document.createElement('div');
+  item.style.cssText = 'padding:8px 10px;border-bottom:1px solid #f0f4f8;font-size:13px;color:#444';
+  item.innerHTML = `<span style="color:#888;font-size:11px">${time}</span> ${icon} ${msg}`;
+  log.insertBefore(item, log.firstChild);
+  // 移除占位提示
+  const placeholder = log.querySelector('div[style*="color:#aaa"]');
+  if (placeholder) placeholder.remove();
+}
+
+function showAlert(msg) {
+  const panel = document.getElementById('alert_panel');
+  document.getElementById('alert_msg').textContent = '⚠️ ' + msg;
+  panel.style.display = 'block';
+  state.alertTriggered = true;
+}
+
+function handleAlert(action) {
+  const actions = {
+    repair: '已联系司机检查制冷设备，设备在30分钟内恢复正常运转。温度恢复至8°C。',
+    transfer: '已联系就近冷库，货物转入温控仓库暂存，同时更换制冷设备正常的车辆，损耗约2%。',
+    report: '已上报质量安全事件，等待企业处置决定。该决策将导致运输延误4-6小时。'
+  };
+  addEvent('📝', `处置方案：${actions[action]}`);
+  document.getElementById('alert_panel').style.display = 'none';
+  state.alertHandled = true;
+  showModal('处置记录', actions[action] + '\n\n✅ 您的处置记录已保存，将纳入实训评分。');
+}
+
+function drawTempChart() {
+  const canvas = document.getElementById('temp_chart');
+  const ctx = canvas.getContext('2d');
+  const W = canvas.width, H = canvas.height;
+  ctx.clearRect(0, 0, W, H);
+
+  // 背景
+  ctx.fillStyle = '#f8f9fa';
+  ctx.fillRect(0, 0, W, H);
+
+  // 安全区域
+  const minTemp = 0, maxTemp = 18;
+  const safeTop = H - (10 - minTemp) / (maxTemp - minTemp) * H;
+  const safeBottom = H - (4 - minTemp) / (maxTemp - minTemp) * H;
+  ctx.fillStyle = 'rgba(26,127,60,0.1)';
+  ctx.fillRect(0, safeTop, W, safeBottom - safeTop);
+
+  // 参考线
+  ctx.strokeStyle = '#1a7f3c';
+  ctx.setLineDash([4, 4]);
+  ctx.lineWidth = 1;
+  [4, 10].forEach(t => {
+    const y = H - (t - minTemp) / (maxTemp - minTemp) * H;
+    ctx.beginPath(); ctx.moveTo(0, y); ctx.lineTo(W, y); ctx.stroke();
+    ctx.fillStyle = '#888'; ctx.font = '10px sans-serif';
+    ctx.fillText(t + '°C', 2, y - 2);
+  });
+  ctx.setLineDash([]);
+
+  // 温度曲线
+  if (tempData.length < 2) return;
+  ctx.strokeStyle = '#1976d2';
+  ctx.lineWidth = 2.5;
+  ctx.beginPath();
+  tempData.forEach((t, i) => {
+    const x = (i / (tempData.length - 1)) * W;
+    const y = H - (t - minTemp) / (maxTemp - minTemp) * H;
+    if (i === 0) ctx.moveTo(x, y); else ctx.lineTo(x, y);
+  });
+  ctx.stroke();
+
+  // 超温区域标红
+  ctx.strokeStyle = '#e74c3c';
+  ctx.lineWidth = 3;
+  ctx.beginPath();
+  let inRed = false;
+  tempData.forEach((t, i) => {
+    const x = (i / (tempData.length - 1)) * W;
+    const y = H - (t - minTemp) / (maxTemp - minTemp) * H;
+    if (t > 10) {
+      if (!inRed) { ctx.moveTo(x, y); inRed = true; } else ctx.lineTo(x, y);
+    } else inRed = false;
+  });
+  ctx.stroke();
+}
+
+// ============ 步骤5：溯码查验 ============
+const traceDB = {
+  'GN-2024-1101': {
+    product: '赣南脐橙',
+    status: 'normal',
+    chain: [
+      { title: '产地录入', time: '2024-11-01 08:30', detail: '信丰县绿源农业合作社 | 采摘2000kg | 纽荷尔脐橙', warning: false },
+      { title: '质量检测上链', time: '2024-11-02 10:15', detail: '农残0.03mg/kg（合格）| 糖度13.5°Brix | 赣州市检测中心', warning: false },
+      { title: '冷库入库', time: '2024-11-03 14:00', detail: '赣州冷链物流中心 | 库位B3区 | 温度8°C', warning: false },
+      { title: '冷链运输出发', time: '2024-11-04 06:00', detail: '赣州→上海 | 全程1050km | 车牌赣B88888', warning: false },
+      { title: '途中温控预警', time: '2024-11-04 13:22', detail: '温度一度升至12.3°C，已处置恢复正常', warning: true },
+      { title: '抵达目的地', time: '2024-11-05 09:40', detail: '上海某大型超市收货完毕 | 品质完好', warning: false },
+    ]
+  },
+  'HN-2024-0923': {
+    product: '湖南黄桃',
+    status: 'warning',
+    chain: [
+      { title: '产地录入', time: '2024-09-23 09:00', detail: '炎陵县三河镇黄桃基地 | 采摘500kg', warning: false },
+      { title: '质量检测上链', time: '2024-09-24 11:00', detail: '农残0.08mg/kg（⚠️超标！国标≤0.05）| 炎陵县检测站', warning: true },
+      { title: '异常：未停运继续入库', time: '2024-09-24 15:30', detail: '⚠️ 检测不合格仍强行入库，违规操作！', warning: true },
+      { title: '冷链运输', time: '2024-09-25 07:00', detail: '炎陵→广州 | 途中温度正常', warning: false },
+      { title: '终端销售', time: '2024-09-26 10:00', detail: '广州某水果批发市场 | 已流入市场', warning: true },
+    ]
+  },
+  'SD-2024-1005': {
+    product: '山东苹果',
+    status: 'normal',
+    chain: [
+      { title: '产地录入', time: '2024-10-05 07:30', detail: '烟台市栖霞苹果合作社 | 采摘5000kg | 红富士', warning: false },
+      { title: '质量检测上链', time: '2024-10-06 09:00', detail: '农残未检出 | 糖度16.2°Brix | 烟台市检测中心', warning: false },
+      { title: '冷库入库', time: '2024-10-07 12:00', detail: '青岛港冷链仓库 | 温度2°C', warning: false },
+      { title: '冷链运输', time: '2024-10-08 06:00', detail: '青岛→北京 | 全程820km | 全程温控正常', warning: false },
+      { title: '抵达目的地', time: '2024-10-09 10:00', detail: '北京新发地批发市场 | 品质优良', warning: false },
+    ]
+  }
+};
+
+function fillCode(code) {
+  document.getElementById('query_code').value = code;
+}
+
+function queryTrace() {
+  const code = document.getElementById('query_code').value.trim();
+  const data = traceDB[code];
+
+  if (!data) {
+    document.getElementById('query_result').innerHTML =
+      '<div class="alert alert-error">❌ 未找到该批次，请检查溯源码是否正确。</div>';
+    document.getElementById('trace_timeline_view').innerHTML =
+      '<div style="color:#aaa;font-size:13px;text-align:center;padding:30px">未找到溯源记录</div>';
+    return;
+  }
+
+  // 结果卡片
+  const isWarning = data.status === 'warning';
+  document.getElementById('query_result').innerHTML = `
+    <div class="alert ${isWarning ? 'alert-error' : 'alert-success'}">
+      ${isWarning ? '⚠️ 该批次存在异常！' : '✅ 该批次溯源信息完整，未发现异常。'}
+      产品：<strong>${data.product}</strong> | 批次：${code}
+    </div>
+  `;
+
+  // 时间轴
+  const timeline = document.getElementById('trace_timeline_view');
+  timeline.innerHTML = '<div class="trace-timeline">' +
+    data.chain.map(item => `
+      <div class="trace-item ${item.warning ? 'warning' : ''}">
+        <div class="trace-item-title">${item.warning ? '⚠️ ' : '✅ '}${item.title}</div>
+        <div class="trace-item-detail">${item.time}</div>
+        <div class="trace-item-detail" style="margin-top:4px">${item.detail}</div>
+      </div>
+    `).join('') + '</div>';
+
+  // 记录到查验台
+  if (!state.verifyRecords.find(r => r.code === code)) {
+    state.verifyRecords.push({ code, product: data.product, status: data.status, chain: data.chain });
+    updateVerifyTable();
+  }
+}
+
+function updateVerifyTable() {
+  const table = document.getElementById('verify_table');
+  table.innerHTML = '<tr><th>批次号</th><th>产品</th><th>查验结果</th><th>异常节点</th></tr>';
+  state.verifyRecords.forEach(r => {
+    const abnormal = r.chain.filter(c => c.warning).map(c => c.title).join('、') || '无';
+    table.innerHTML += `<tr>
+      <td style="font-family:monospace">${r.code}</td>
+      <td>${r.product}</td>
+      <td><span class="badge ${r.status === 'warning' ? 'badge-red' : 'badge-green'}">${r.status === 'warning' ? '有异常' : '正常'}</span></td>
+      <td style="font-size:12px;color:${r.status === 'warning' ? '#e74c3c' : '#888'}">${abnormal}</td>
+    </tr>`;
+  });
+}
+
+// ============ 步骤6：评分 ============
+function calcScore() {
+  const s1 = state.productData ? 20 : 0;
+  const s2 = state.blockchainData.length ? 20 : 0;
+  const s3 = state.warehouseData?.outbound ? 20 : (state.warehouseData ? 15 : 0);
+  const s4 = state.alertHandled ? 20 : (state.transportStarted ? 10 : 0);
+  const s5 = state.verifyRecords.filter(r => r.status === 'warning').length > 0 ? 20 : (state.verifyRecords.length > 0 ? 10 : 0);
+  const total = s1 + s2 + s3 + s4 + s5;
+
+  const statusMap = (s, full) => s >= full ? `<span class="badge badge-green">✅ 完成</span>` :
+    s > 0 ? `<span class="badge badge-orange">⚠️ 部分完成</span>` : `<span class="badge badge-red">❌ 未完成</span>`;
+
+  document.getElementById('s1_status').innerHTML = statusMap(s1, 20);
+  document.getElementById('s1_score').textContent = s1 + '/20';
+  document.getElementById('s2_status').innerHTML = statusMap(s2, 20);
+  document.getElementById('s2_score').textContent = s2 + '/20';
+  document.getElementById('s3_status').innerHTML = statusMap(s3, 20);
+  document.getElementById('s3_score').textContent = s3 + '/20';
+  document.getElementById('s4_status').innerHTML = statusMap(s4, 20);
+  document.getElementById('s4_score').textContent = s4 + '/20';
+  document.getElementById('s5_status').innerHTML = statusMap(s5, 20);
+  document.getElementById('s5_score').textContent = s5 + '/20';
+  document.getElementById('total_score').textContent = total + '/100';
+
+  document.getElementById('final_score_display').textContent = total;
+  const comment = total >= 90 ? '优秀！你已全面掌握农产品供应链溯源全流程 🎉' :
+    total >= 75 ? '良好！溯源流程基本掌握，继续加油！' :
+    total >= 60 ? '合格，部分环节需要强化练习。' : '需要重新练习，建议再次完成全部实训环节。';
+  document.getElementById('score_comment').textContent = comment;
+  document.getElementById('score_result_panel').style.display = 'block';
+}
+
+// ============ 工具函数 ============
+function showModal(title, body) {
+  document.getElementById('modal_title').textContent = title;
+  document.getElementById('modal_body').textContent = body;
+  document.getElementById('modal').classList.add('show');
+}
+function closeModal() {
+  document.getElementById('modal').classList.remove('show');
+}
+
+// 初始化
+updateActionBar();
+
+// 检查URL参数，如果有code参数则自动查询
+(function checkUrlParams() {
+  const params = new URLSearchParams(window.location.search);
+  const code = params.get('code');
+  if (code) {
+    // 延迟一下确保页面加载完成
+    setTimeout(() => {
+      document.getElementById('query_code').value = code;
+      queryTrace();
+      // 跳转到溯码查验页面
+      goToStep(5, true);
+    }, 500);
+  }
+})();
+</script>
+</body>
+</html>

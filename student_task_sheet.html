@@ -1,0 +1,269 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>学生实训任务单 - 农产品溯源实训</title>
+<style>
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { font-family: 'Microsoft YaHei', SimSun, sans-serif; font-size: 14px; color: #222; background: white; }
+  .page { width: 210mm; min-height: 297mm; margin: 0 auto; padding: 15mm 18mm; }
+  
+  h1 { font-size: 20px; text-align: center; margin-bottom: 4px; }
+  h2 { font-size: 15px; background: #1a7f3c; color: white; padding: 6px 12px; margin: 16px 0 8px; border-radius: 4px; }
+  h3 { font-size: 13px; color: #1a7f3c; margin: 10px 0 6px; font-weight: bold; }
+  .subtitle { text-align: center; color: #888; font-size: 12px; margin-bottom: 16px; }
+  
+  .info-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 0; border: 1px solid #ccc; margin-bottom: 16px; }
+  .info-cell { padding: 6px 10px; border-right: 1px solid #ccc; font-size: 13px; }
+  .info-cell:last-child { border-right: none; }
+  .info-cell span { color: #888; margin-right: 4px; }
+  .info-line { border-bottom: 1px solid #333; display: inline-block; width: 100px; }
+
+  table { width: 100%; border-collapse: collapse; margin-bottom: 12px; font-size: 13px; }
+  th { background: #e8f5e9; padding: 6px 8px; border: 1px solid #ccc; text-align: center; font-weight: bold; }
+  td { padding: 6px 8px; border: 1px solid #ccc; vertical-align: top; }
+  td.label { background: #f9f9f9; font-weight: bold; white-space: nowrap; width: 90px; }
+
+  .write-line { border-bottom: 1px solid #999; min-height: 22px; margin: 3px 0; }
+  .write-block { border: 1px solid #ccc; min-height: 50px; padding: 4px; margin: 4px 0; border-radius: 3px; }
+  .write-block-lg { min-height: 70px; }
+
+  .task-box { border: 2px solid #1a7f3c; border-radius: 6px; padding: 10px 14px; margin-bottom: 12px; }
+  .task-num { display: inline-block; background: #1a7f3c; color: white; border-radius: 50%; width: 22px; height: 22px; text-align: center; line-height: 22px; font-size: 12px; margin-right: 6px; }
+
+  .note-box { background: #fffde7; border-left: 4px solid #f39c12; padding: 8px 12px; margin: 8px 0; font-size: 12px; color: #7d4e00; }
+  .concept-box { background: #e3f2fd; border-left: 4px solid #1976d2; padding: 8px 12px; margin: 8px 0; font-size: 12px; color: #0d47a1; }
+
+  .score-row { display: flex; gap: 0; margin-top: 12px; }
+  .score-cell { flex: 1; border: 1px solid #ccc; padding: 8px; text-align: center; }
+  .score-cell .label { background: #f0faf4; color: #1a7f3c; font-size: 12px; font-weight: bold; display: block; margin-bottom: 4px; }
+  .score-cell .val { font-size: 18px; font-weight: bold; color: #1a7f3c; }
+
+  .divider { border-top: 2px dashed #ccc; margin: 16px 0; }
+
+  @media print {
+    .page { padding: 10mm 15mm; }
+    .no-print { display: none; }
+    h2 { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+    .score-cell .label { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+  }
+  
+  .print-btn { 
+    position: fixed; top: 20px; right: 20px; padding: 10px 20px;
+    background: #1a7f3c; color: white; border: none; border-radius: 8px;
+    cursor: pointer; font-size: 14px; font-family: inherit;
+  }
+</style>
+</head>
+<body>
+<button class="print-btn no-print" onclick="window.print()">🖨️ 打印任务单</button>
+
+<div class="page">
+
+<h1>🌾 农产品全链条溯源实训 · 学生任务单</h1>
+<div class="subtitle">课程：农产品供应链管理 / 采购与供应链 &nbsp;｜&nbsp; 学时：2学时 &nbsp;｜&nbsp; 形式：个人完整体验全流程</div>
+
+<!-- 基本信息 -->
+<div class="info-grid">
+  <div class="info-cell"><span>姓名：</span><span class="info-line"></span></div>
+  <div class="info-cell"><span>学号：</span><span class="info-line"></span></div>
+  <div class="info-cell"><span>班级：</span><span class="info-line"></span></div>
+  <div class="info-cell"><span>实训日期：</span><span class="info-line" style="width:80px"></span></div>
+  <div class="info-cell"><span>实训室：</span><span>供应链管理实训室</span></div>
+  <div class="info-cell"><span>指导教师：</span><span class="info-line" style="width:70px"></span></div>
+</div>
+
+<!-- 实训目标 -->
+<h2>一、实训目标</h2>
+<table>
+  <tr><th width="30%">知识目标</th><th width="35%">技能目标</th><th width="35%">素养目标</th></tr>
+  <tr>
+    <td>① 了解农产品供应链各环节的业务流程<br>② 理解区块链"哈希上链"的防篡改原理<br>③ 掌握冷链管理关键控制点概念</td>
+    <td>① 能操作仿真WMS系统完成入/出库<br>② 能识别冷链运输中的温控异常<br>③ 能通过溯源码查询并判断产品安全性</td>
+    <td>① 树立农产品质量安全意识<br>② 培养供应链全局思维<br>③ 感受数字化技术对传统农业的赋能价值</td>
+  </tr>
+</table>
+
+<!-- 本次实训追踪产品 -->
+<div class="note-box">
+  📦 <strong>本次实训产品：</strong>赣南脐橙（批次号：GN-2024-1101）&nbsp;
+  产地：江西省赣州市信丰县 → 目的地：上海某大型超市 &nbsp;|&nbsp; 数量：2000 kg
+</div>
+
+<!-- 实训流程图 -->
+<h2>二、实训流程说明</h2>
+<table>
+  <tr>
+    <th>环节</th><th>角色扮演</th><th>主要操作</th><th>完成标志</th>
+  </tr>
+  <tr>
+    <td>① 产地录入</td><td>🧑‍🌾 基地农户</td>
+    <td>填写产品信息（品种、产地、采摘日期、农药记录等），生成溯源码</td>
+    <td>获得溯源码 GN-2024-1101</td>
+  </tr>
+  <tr>
+    <td>② 检测上链</td><td>🔬 检测机构</td>
+    <td>填写检测数据（农残、糖度等），点击"上链"，体验哈希原理演示</td>
+    <td>区块链账本出现3个区块</td>
+  </tr>
+  <tr>
+    <td>③ 仓储管理</td><td>🏭 仓管员</td>
+    <td>扫码入库→在货架图选择库位→完成出库</td>
+    <td>库存台账显示"已出库"</td>
+  </tr>
+  <tr>
+    <td>④ 冷链运输</td><td>🚛 调度员</td>
+    <td>启动运输，监控温度曲线，处理制冷故障预警</td>
+    <td>做出预警处置决策</td>
+  </tr>
+  <tr>
+    <td>⑤ 溯码查验</td><td>🔍 监管人员</td>
+    <td>查询3个批次溯源信息，找出有问题的批次及异常节点</td>
+    <td>查验记录表显示3条记录</td>
+  </tr>
+</table>
+
+<div class="divider"></div>
+
+<!-- 任务一 -->
+<h2>任务一：产地信息录入（20分）</h2>
+<div class="concept-box">
+  💡 <strong>背景知识</strong>：溯源的起点在产地。产地信息的完整性和真实性，决定了整条溯源链的可信度。
+  在系统中，每录入一批产品，就会生成唯一的溯源码，就像产品的"数字身份证"。
+</div>
+<h3>【操作记录】请根据系统中录入的内容，填写以下信息：</h3>
+<table>
+  <tr><td class="label">产品名称</td><td><div class="write-line"></div></td><td class="label">产品品种</td><td><div class="write-line"></div></td></tr>
+  <tr><td class="label">种植基地</td><td><div class="write-line"></div></td><td class="label">采摘日期</td><td><div class="write-line"></div></td></tr>
+  <tr><td class="label">最后施药距采摘</td><td><div class="write-line"></div></td><td class="label">生成溯源码</td><td><div class="write-line" style="font-weight:bold"></div></td></tr>
+</table>
+<h3>【思考题】为什么要记录"最后一次农药施用距采摘的天数"？</h3>
+<div class="write-block"></div>
+
+<!-- 任务二 -->
+<h2>任务二：检测上链与区块链体验（20分）</h2>
+<div class="concept-box">
+  💡 <strong>背景知识</strong>：区块链的核心特点是"不可篡改"。
+  每条数据在上链前会计算SHA-256哈希值（数据指纹），并包含上一个区块的哈希。
+  一旦修改任何数据，哈希值立刻变化，整条链断裂——篡改行为无处遁形。
+</div>
+<h3>【操作记录】完成检测后填写：</h3>
+<table>
+  <tr><td class="label">检测机构</td><td colspan="3"><div class="write-line"></div></td></tr>
+  <tr><td class="label">农残实测值</td><td><div class="write-line"></div></td><td class="label">国标上限</td><td><div class="write-line"></div></td></tr>
+  <tr><td class="label">检测结论</td><td colspan="3"><div class="write-line"></div></td></tr>
+</table>
+<h3>【区块链实验】点击"模拟数据篡改"后，观察并记录：</h3>
+<table>
+  <tr><th>观察项目</th><th>篡改前</th><th>篡改后</th></tr>
+  <tr><td>第1号区块哈希值</td><td><div class="write-line"></div></td><td><div class="write-line"></div></td></tr>
+  <tr><td>第2号区块状态</td><td><div class="write-line"></div></td><td><div class="write-line"></div></td></tr>
+  <tr><td>链是否仍然有效</td><td>有效</td><td><div class="write-line"></div></td></tr>
+</table>
+<h3>【思考题】如果不用区块链，只用普通数据库存储溯源数据，会有什么风险？</h3>
+<div class="write-block"></div>
+
+<!-- 任务三 -->
+<h2>任务三：仓储管理操作（20分）</h2>
+<div class="concept-box">
+  💡 <strong>背景知识</strong>：WMS（仓库管理系统）是现代仓储的核心工具，
+  管理货物从入库、存放到出库的全生命周期。农产品仓储还要考虑
+  温控条件、保质期管理和先进先出（FIFO）原则。
+</div>
+<h3>【操作记录】</h3>
+<table>
+  <tr><td class="label">入库溯源码</td><td><div class="write-line"></div></td><td class="label">入库数量</td><td><div class="write-line"></div></td></tr>
+  <tr><td class="label">分配库位</td><td><div class="write-line"></div></td><td class="label">储存温度要求</td><td><div class="write-line"></div></td></tr>
+  <tr><td class="label">出库原因</td><td colspan="3"><div class="write-line"></div></td></tr>
+</table>
+<h3>【货位图记录】在下方方格中，圈出或标记您为本批橙子选择的库位：</h3>
+<table style="table-layout:fixed">
+  <tr>
+    <td style="width:40px;text-align:center;background:#f0faf4;font-weight:bold">A</td>
+    <td style="width:40px;height:30px;text-align:center">A1</td><td style="width:40px;height:30px;text-align:center;background:#e8f5e9">A2</td>
+    <td style="width:40px;height:30px;text-align:center">A3</td><td style="width:40px;height:30px;text-align:center">A4</td>
+    <td style="width:40px;height:30px;text-align:center">A5</td><td style="width:40px;height:30px;text-align:center;background:#e8f5e9">A6</td>
+    <td style="width:40px;height:30px;text-align:center">A7</td><td style="width:40px;height:30px;text-align:center">A8</td>
+  </tr>
+  <tr>
+    <td style="text-align:center;background:#f0faf4;font-weight:bold">B</td>
+    <td style="height:30px;text-align:center">B1</td><td style="height:30px;text-align:center">B2</td>
+    <td style="height:30px;text-align:center;background:#e8f5e9">B3</td><td style="height:30px;text-align:center">B4</td>
+    <td style="height:30px;text-align:center">B5</td><td style="height:30px;text-align:center;background:#e8f5e9">B6</td>
+    <td style="height:30px;text-align:center">B7</td><td style="height:30px;text-align:center">B8</td>
+  </tr>
+</table>
+<p style="font-size:12px;color:#888;margin-top:4px">🟩 绿色格 = 已被其他产品占用；白色格 = 可用库位</p>
+
+<!-- 任务四 -->
+<h2>任务四：冷链运输监控与应急处置（20分）</h2>
+<div class="concept-box">
+  💡 <strong>背景知识</strong>：冷链断链是农产品损耗的主要原因之一。
+  脐橙的适宜储运温度为 4~10°C，超出此范围会加速果皮失水、腐败。
+  调度员需要实时监控，并在异常发生时快速决策。
+</div>
+<h3>【运输数据记录】</h3>
+<table>
+  <tr><td class="label">出发城市</td><td>赣州</td><td class="label">目的城市</td><td>上海</td></tr>
+  <tr><td class="label">运输里程</td><td>约1050 km</td><td class="label">安全温度范围</td><td>4~10°C</td></tr>
+  <tr><td class="label">途中异常温度</td><td><div class="write-line"></div></td><td class="label">异常发生地点</td><td><div class="write-line"></div></td></tr>
+</table>
+<h3>【应急处置决策】遇到温控预警时，我选择的处置方案是：</h3>
+<div class="write-block"></div>
+<h3>【思考题】比较三种处置方案的优缺点：</h3>
+<table>
+  <tr><th>方案</th><th>优点</th><th>缺点/风险</th></tr>
+  <tr><td>联系司机修复设备</td><td><div class="write-line"></div></td><td><div class="write-line"></div></td></tr>
+  <tr><td>就近转仓换车</td><td><div class="write-line"></div></td><td><div class="write-line"></div></td></tr>
+  <tr><td>上报质量安全事件</td><td><div class="write-line"></div></td><td><div class="write-line"></div></td></tr>
+</table>
+
+<!-- 任务五 -->
+<h2>任务五：溯码查验与异常识别（20分）</h2>
+<div class="concept-box">
+  💡 <strong>背景知识</strong>：消费者或监管人员可以通过溯源码，查询产品从田间到货架的完整链路。
+  溯源系统最重要的意义在于：<strong>出了问题能找到责任节点，不让问题产品蒙混过关。</strong>
+</div>
+<h3>【查验记录】对以下3个批次进行查询，记录结果：</h3>
+<table>
+  <tr><th>批次号</th><th>产品名称</th><th>查验结论</th><th>如有异常，异常发生在哪个环节？</th></tr>
+  <tr><td>GN-2024-1101</td><td>赣南脐橙</td><td><div class="write-line"></div></td><td><div class="write-line"></div></td></tr>
+  <tr><td>HN-2024-0923</td><td>湖南黄桃</td><td><div class="write-line"></div></td><td><div class="write-line"></div></td></tr>
+  <tr><td>SD-2024-1005</td><td>山东苹果</td><td><div class="write-line"></div></td><td><div class="write-line"></div></td></tr>
+</table>
+<h3>【重点分析】HN-2024-0923批次存在什么问题？违反了哪些食品安全规定？</h3>
+<div class="write-block write-block-lg"></div>
+
+<div class="divider"></div>
+
+<!-- 实训反思 -->
+<h2>六、实训反思与总结</h2>
+<h3>1. 用自己的话解释"区块链不可篡改"的原理（3句话以内）：</h3>
+<div class="write-block"></div>
+<h3>2. 如果你是某农产品公司的供应链主管，你会优先在哪个环节投资数字化建设？为什么？</h3>
+<div class="write-block write-block-lg"></div>
+<h3>3. 数字化溯源系统对"产地农民"有什么好处？对"消费者"有什么好处？</h3>
+<table>
+  <tr><th>对产地农民的好处</th><th>对消费者的好处</th></tr>
+  <tr><td><div class="write-block"></div></td><td><div class="write-block"></div></td></tr>
+</table>
+
+<!-- 评分栏 -->
+<div class="divider"></div>
+<h2 style="background:#888">七、教师评分（教师填写）</h2>
+<div class="score-row">
+  <div class="score-cell"><span class="label">产地录入</span><span class="val">&nbsp;&nbsp;/20</span></div>
+  <div class="score-cell"><span class="label">检测上链</span><span class="val">&nbsp;&nbsp;/20</span></div>
+  <div class="score-cell"><span class="label">仓储操作</span><span class="val">&nbsp;&nbsp;/20</span></div>
+  <div class="score-cell"><span class="label">冷链监控</span><span class="val">&nbsp;&nbsp;/20</span></div>
+  <div class="score-cell"><span class="label">溯码查验</span><span class="val">&nbsp;&nbsp;/20</span></div>
+  <div class="score-cell" style="background:#e8f5e9"><span class="label">总分</span><span class="val">&nbsp;&nbsp;/100</span></div>
+</div>
+<table style="margin-top:12px">
+  <tr><td class="label" style="width:80px">教师评语</td><td><div class="write-block" style="min-height:40px"></div></td></tr>
+  <tr><td class="label">教师签名</td><td><div class="write-line" style="width:120px"></div></td><td style="width:60px;text-align:right;color:#888;font-size:12px">批阅日期：</td><td><div class="write-line" style="width:100px"></div></td></tr>
+</table>
+
+</div><!-- /page -->
+</body>
+</html>

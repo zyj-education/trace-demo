@@ -1,0 +1,424 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>农产品溯源查询</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Microsoft YaHei', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+      background: linear-gradient(135deg, #f0faf4 0%, #e8f5e9 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 16px;
+    }
+
+    .container {
+      width: 100%;
+      max-width: 480px;
+      background: white;
+      border-radius: 16px;
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.12);
+      overflow: hidden;
+    }
+
+    .header {
+      background: linear-gradient(135deg, #1a7f3c 0%, #2ecc71 100%);
+      color: white;
+      padding: 24px 20px;
+      text-align: center;
+    }
+
+    .header .icon {
+      font-size: 48px;
+      margin-bottom: 12px;
+      display: block;
+    }
+
+    .header h1 {
+      font-size: 24px;
+      font-weight: bold;
+      letter-spacing: 1px;
+    }
+
+    .header p {
+      font-size: 13px;
+      margin-top: 8px;
+      opacity: 0.9;
+    }
+
+    .content {
+      padding: 24px 20px;
+    }
+
+    .info-section {
+      margin-bottom: 20px;
+    }
+
+    .info-section-title {
+      font-size: 14px;
+      font-weight: bold;
+      color: #1a7f3c;
+      margin-bottom: 12px;
+      padding-bottom: 8px;
+      border-bottom: 2px solid #f0faf4;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+    }
+
+    .info-item {
+      display: flex;
+      justify-content: space-between;
+      padding: 10px 0;
+      font-size: 14px;
+      border-bottom: 1px solid #f5f5f5;
+    }
+
+    .info-item:last-child {
+      border-bottom: none;
+    }
+
+    .info-label {
+      color: #666;
+      font-weight: 500;
+    }
+
+    .info-value {
+      color: #1a7f3c;
+      font-weight: bold;
+      text-align: right;
+      flex: 1;
+      margin-left: 12px;
+    }
+
+    .status-badge {
+      display: inline-block;
+      padding: 4px 12px;
+      border-radius: 20px;
+      font-size: 12px;
+      font-weight: bold;
+      margin-top: 8px;
+    }
+
+    .status-success {
+      background: #e8f5e9;
+      color: #1a7f3c;
+    }
+
+    .status-warning {
+      background: #fff3e0;
+      color: #f39c12;
+    }
+
+    .status-pending {
+      background: #e3f2fd;
+      color: #2196f3;
+    }
+
+    .trace-path {
+      margin-top: 20px;
+      padding: 16px;
+      background: #f9f9f9;
+      border-radius: 12px;
+      border-left: 4px solid #1a7f3c;
+    }
+
+    .trace-path h3 {
+      font-size: 14px;
+      color: #1a7f3c;
+      margin-bottom: 12px;
+      font-weight: bold;
+    }
+
+    .trace-step {
+      display: flex;
+      gap: 12px;
+      margin-bottom: 12px;
+      font-size: 13px;
+      padding-bottom: 12px;
+      border-bottom: 1px dashed #ddd;
+    }
+
+    .trace-step:last-child {
+      border-bottom: none;
+      margin-bottom: 0;
+      padding-bottom: 0;
+    }
+
+    .trace-icon {
+      font-size: 20px;
+      min-width: 24px;
+      text-align: center;
+    }
+
+    .trace-info {
+      flex: 1;
+    }
+
+    .trace-info-title {
+      font-weight: bold;
+      color: #333;
+      margin-bottom: 4px;
+    }
+
+    .trace-info-detail {
+      color: #888;
+      font-size: 12px;
+    }
+
+    .footer {
+      padding: 16px 20px;
+      background: #f9f9f9;
+      text-align: center;
+      font-size: 12px;
+      color: #999;
+      border-top: 1px solid #f0f0f0;
+    }
+
+    .footer p {
+      margin: 4px 0;
+    }
+
+    .qr-hint {
+      margin-top: 20px;
+      padding: 16px;
+      background: linear-gradient(135deg, #fff9e6 0%, #fff3e0 100%);
+      border-radius: 12px;
+      border: 1px solid #ffe082;
+      text-align: center;
+      font-size: 13px;
+      color: #f39c12;
+    }
+
+    .qr-hint strong {
+      display: block;
+      margin-bottom: 4px;
+      font-size: 14px;
+    }
+
+    @media (max-width: 360px) {
+      .container {
+        border-radius: 0;
+      }
+
+      .content {
+        padding: 16px 12px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <span class="icon">🍊</span>
+      <h1>农产品溯源</h1>
+      <p>全链路追踪 · 质量保证</p>
+    </div>
+
+    <div class="content">
+      <!-- 产品基本信息 -->
+      <div class="info-section">
+        <div class="info-section-title">📦 产品信息</div>
+        <div class="info-item">
+          <span class="info-label">产品名称</span>
+          <span class="info-value" id="productName">-</span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">品种</span>
+          <span class="info-value" id="variety">-</span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">溯源码</span>
+          <span class="info-value" id="traceCode">-</span>
+        </div>
+      </div>
+
+      <!-- 产地信息 -->
+      <div class="info-section">
+        <div class="info-section-title">🌱 产地信息</div>
+        <div class="info-item">
+          <span class="info-label">产地</span>
+          <span class="info-value" id="farm">-</span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">地址</span>
+          <span class="info-value" id="address">-</span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">采摘日期</span>
+          <span class="info-value" id="harvestDate">-</span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">重量</span>
+          <span class="info-value" id="weight">-</span>
+        </div>
+      </div>
+
+      <!-- 质量检测 -->
+      <div class="info-section">
+        <div class="info-section-title">✅ 质量检测</div>
+        <div class="info-item">
+          <span class="info-label">检测状态</span>
+          <span class="info-value">
+            <span class="status-badge status-success">合格</span>
+          </span>
+        </div>
+        <div class="info-item">
+          <span class="info-label">农残检测</span>
+          <span class="info-value" id="pesticideTest">符合标准</span>
+        </div>
+      </div>
+
+      <!-- 物流追踪 -->
+      <div class="info-section">
+        <div class="info-section-title">🚚 物流追踪</div>
+        <div class="trace-path">
+          <h3>完整溯源链路</h3>
+          <div class="trace-step">
+            <div class="trace-icon">🚜</div>
+            <div class="trace-info">
+              <div class="trace-info-title">产地采摘</div>
+              <div class="trace-info-detail" id="step1">2024-11-01 信丰县</div>
+            </div>
+          </div>
+          <div class="trace-step">
+            <div class="trace-icon">🔬</div>
+            <div class="trace-info">
+              <div class="trace-info-title">质检上链</div>
+              <div class="trace-info-detail" id="step2">2024-11-02 检验合格</div>
+            </div>
+          </div>
+          <div class="trace-step">
+            <div class="trace-icon">📦</div>
+            <div class="trace-info">
+              <div class="trace-info-title">冷链仓储</div>
+              <div class="trace-info-detail" id="step3">2024-11-03 已入库</div>
+            </div>
+          </div>
+          <div class="trace-step">
+            <div class="trace-icon">🚗</div>
+            <div class="trace-info">
+              <div class="trace-info-title">冷链运输</div>
+              <div class="trace-info-detail" id="step4">温控 2-8°C</div>
+            </div>
+          </div>
+          <div class="trace-step">
+            <div class="trace-icon">🏪</div>
+            <div class="trace-info">
+              <div class="trace-info-title">销售门店</div>
+              <div class="trace-info-detail" id="step5">上海新鲜超市</div>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <!-- 消费者温馨提示 -->
+      <div class="qr-hint">
+        <strong>✨ 溯源保障</strong>
+        此产品已通过完整的溯源链路验证，质量安全有保障。欢迎放心购买！
+      </div>
+    </div>
+
+    <div class="footer">
+      <p>📱 农产品全链条溯源系统</p>
+      <p id="scanTime">扫描时间：-</p>
+    </div>
+  </div>
+
+  <script>
+    // 模拟的溯源数据库
+    const traceDatabase = {
+      'GN-2024-1101': {
+        productName: '赣南脐橙',
+        variety: '纽荷尔脐橙',
+        traceCode: 'GN-2024-1101',
+        farm: '信丰县绿源农业合作社',
+        address: '江西省赣州市信丰县',
+        harvestDate: '2024-11-01',
+        weight: '2000 kg',
+        pesticideTest: '符合标准',
+        step1: '2024-11-01 信丰县绿源农业合作社',
+        step2: '2024-11-02 质检合格',
+        step3: '2024-11-03 赣州冷链中心已入库',
+        step4: '温度恒定 2-8°C，运输中...',
+        step5: '上海新鲜超市'
+      },
+      'HN-2024-0923': {
+        productName: '海南木瓜',
+        variety: '红心木瓜',
+        traceCode: 'HN-2024-0923',
+        farm: '海口绿农种植基地',
+        address: '海南省海口市',
+        harvestDate: '2024-09-23',
+        weight: '500 kg',
+        pesticideTest: '符合标准',
+        step1: '2024-09-23 海口绿农基地',
+        step2: '2024-09-24 质检合格',
+        step3: '2024-09-25 海口冷链中心',
+        step4: '温度恒定 12-15°C，运输中...',
+        step5: '广州生鲜市场'
+      },
+      'SD-2024-1005': {
+        productName: '山东大蒜',
+        variety: '白皮大蒜',
+        traceCode: 'SD-2024-1005',
+        farm: '金乡大蒜合作社',
+        address: '山东省济宁市金乡县',
+        harvestDate: '2024-10-05',
+        weight: '800 kg',
+        pesticideTest: '符合标准',
+        step1: '2024-10-05 金乡县',
+        step2: '2024-10-06 质检合格',
+        step3: '2024-10-07 仓储中心',
+        step4: '温度恒定 10-15°C，运输中...',
+        step5: '北京超市'
+      }
+    };
+
+    // 获取URL参数中的溯源码
+    function getTraceCodeFromURL() {
+      const params = new URLSearchParams(window.location.search);
+      return params.get('code') || 'GN-2024-1101'; // 默认显示赣南脐橙
+    }
+
+    // 显示溯源信息
+    function displayTraceInfo() {
+      const code = getTraceCodeFromURL();
+      const data = traceDatabase[code];
+
+      if (data) {
+        document.getElementById('productName').textContent = data.productName;
+        document.getElementById('variety').textContent = data.variety;
+        document.getElementById('traceCode').textContent = data.traceCode;
+        document.getElementById('farm').textContent = data.farm;
+        document.getElementById('address').textContent = data.address;
+        document.getElementById('harvestDate').textContent = data.harvestDate;
+        document.getElementById('weight').textContent = data.weight;
+        document.getElementById('pesticideTest').textContent = data.pesticideTest;
+        document.getElementById('step1').textContent = data.step1;
+        document.getElementById('step2').textContent = data.step2;
+        document.getElementById('step3').textContent = data.step3;
+        document.getElementById('step4').textContent = data.step4;
+        document.getElementById('step5').textContent = data.step5;
+      }
+
+      // 显示扫描时间
+      const now = new Date();
+      const time = now.toLocaleString('zh-CN');
+      document.getElementById('scanTime').textContent = '扫描时间：' + time;
+    }
+
+    // 页面加载时显示溯源信息
+    window.addEventListener('DOMContentLoaded', displayTraceInfo);
+  </script>
+</body>
+</html>

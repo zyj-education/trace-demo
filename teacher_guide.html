@@ -1,0 +1,350 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<title>教师操作指南 - 农产品溯源实训</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { font-family:'Microsoft YaHei',sans-serif; font-size:14px; color:#222; background:#f5f7fa; }
+  .container { max-width: 960px; margin: 0 auto; padding: 30px 20px; }
+  
+  h1 { font-size: 26px; font-weight: bold; color: #1a7f3c; margin-bottom: 4px; }
+  .header { background: linear-gradient(135deg,#1a7f3c,#4caf50); color: white; padding: 24px 32px; border-radius: 12px; margin-bottom: 24px; }
+  .header p { opacity: 0.85; margin-top: 6px; font-size: 14px; }
+  
+  .card { background: white; border-radius: 10px; padding: 22px 24px; margin-bottom: 18px; box-shadow: 0 2px 8px rgba(0,0,0,0.06); }
+  .card-title { font-size: 17px; font-weight: bold; color: #1a7f3c; margin-bottom: 14px; padding-bottom: 10px; border-bottom: 2px solid #e8f5e9; }
+  
+  table { width: 100%; border-collapse: collapse; margin-bottom: 8px; font-size: 13px; }
+  th { background: #e8f5e9; padding: 8px 12px; border: 1px solid #ddd; text-align: left; color: #1a7f3c; font-weight: bold; }
+  td { padding: 8px 12px; border: 1px solid #ddd; vertical-align: top; }
+  tr:nth-child(even) td { background: #fafffe; }
+  
+  .timeline { position: relative; padding-left: 24px; }
+  .timeline::before { content:''; position:absolute; left:8px; top:0; bottom:0; width:2px; background:#d0ead8; }
+  .tl-item { position: relative; margin-bottom: 16px; }
+  .tl-item::before { content:''; position:absolute; left:-19px; top:4px; width:12px; height:12px; border-radius:50%; background:#1a7f3c; }
+  .tl-time { font-size:12px; color:#888; margin-bottom:2px; }
+  .tl-title { font-weight:bold; color:#333; margin-bottom:4px; }
+  .tl-body { font-size:13px; color:#555; line-height:1.6; }
+  
+  .badge { display:inline-block; padding:2px 10px; border-radius:20px; font-size:12px; font-weight:500; }
+  .badge-green { background:#e8f5e9; color:#1a7f3c; }
+  .badge-orange { background:#fff3e0; color:#f39c12; }
+  .badge-red { background:#fdecea; color:#e74c3c; }
+  .badge-blue { background:#e3f2fd; color:#1976d2; }
+  
+  .tip { background:#e8f5e9; border-left:4px solid #1a7f3c; padding:10px 14px; margin:10px 0; font-size:13px; color:#1a4a28; border-radius:0 6px 6px 0; }
+  .warn { background:#fff3e0; border-left:4px solid #f39c12; padding:10px 14px; margin:10px 0; font-size:13px; color:#7d4e00; border-radius:0 6px 6px 0; }
+  
+  .two-col { display:grid; grid-template-columns:1fr 1fr; gap:18px; }
+  .three-col { display:grid; grid-template-columns:1fr 1fr 1fr; gap:16px; }
+  
+  .mini-card { background:#f8fffe; border:1px solid #d0ead8; border-radius:8px; padding:14px; }
+  .mini-card .num { font-size:28px; font-weight:bold; color:#1a7f3c; }
+  .mini-card .label { font-size:12px; color:#888; margin-top:2px; }
+  
+  .score-rubric { }
+  .score-rubric td:first-child { width:100px; font-weight:bold; }
+  
+  ul, ol { padding-left: 20px; }
+  li { margin-bottom: 6px; font-size: 13px; line-height: 1.6; }
+  
+  .answer-box { background:#f0faf4; border:1px dashed #1a7f3c; border-radius:6px; padding:12px; margin-top:8px; font-size:13px; }
+  .answer-title { font-weight:bold; color:#1a7f3c; margin-bottom:6px; }
+
+  @media print {
+    body { background: white; }
+    .container { padding: 10px; }
+  }
+</style>
+</head>
+<body>
+<div class="container">
+
+<!-- 头部 -->
+<div class="header">
+  <h1>🌾 农产品全链条溯源仿真实训 · 教师操作指南</h1>
+  <p>课程：农产品供应链管理 / 采购与供应链 &nbsp;|&nbsp; 学时：2学时 &nbsp;|&nbsp; 适用专业：物流管理、供应链管理、农产品经营</p>
+</div>
+
+<!-- 课前准备 -->
+<div class="card">
+  <div class="card-title">📋 一、课前准备清单</div>
+  <div class="two-col">
+    <div>
+      <h3 style="margin-bottom:10px;color:#555">环境准备</h3>
+      <ul>
+        <li>✅ 确认实训室每台电脑可正常打开浏览器（Chrome/Edge）</li>
+        <li>✅ 打开 <code style="background:#f0f4f8;padding:2px 6px;border-radius:3px">index.html</code> 测试是否正常运行</li>
+        <li>✅ 可将文件放在教学服务器或U盘分发，也可通过局域网访问</li>
+        <li>✅ 打印学生任务单（每人一份 <code>student_task_sheet.html</code>）</li>
+        <li>✅ 准备白板/黑板用于板书关键概念</li>
+      </ul>
+    </div>
+    <div>
+      <h3 style="margin-bottom:10px;color:#555">材料准备</h3>
+      <ul>
+        <li>📄 学生任务单（已打印，含评分栏）</li>
+        <li>💻 仿真平台网页（index.html，每台电脑均可独立运行）</li>
+        <li>📊 教师PPT导入课件（可选，建议5分钟课前导入）</li>
+        <li>🎯 参考答案（见本指南第五部分）</li>
+      </ul>
+      <div class="warn" style="margin-top:10px">
+        ⚠️ 平台为纯前端网页，<strong>无需联网、无需服务器</strong>，直接双击 index.html 即可运行。
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 教学设计 -->
+<div class="card">
+  <div class="card-title">⏱️ 二、课堂时间分配（共90分钟）</div>
+  <div class="timeline">
+    <div class="tl-item">
+      <div class="tl-time">0:00 - 0:10（10分钟）</div>
+      <div class="tl-title">📢 课程导入</div>
+      <div class="tl-body">
+        展示一个真实案例：<em>"某批蔬菜农药超标，监管部门如何溯源到具体产地？"</em>
+        引导学生思考：<strong>没有溯源系统时靠什么？有了溯源系统之后有什么不同？</strong>
+        （建议PPT展示1-2张实际溯源码扫码界面截图）
+      </div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-time">0:10 - 0:15（5分钟）</div>
+      <div class="tl-title">📝 任务发放 + 平台操作说明</div>
+      <div class="tl-body">
+        发放学生任务单，简要演示平台打开方式和界面布局。
+        强调：<strong>任务单需要边操作边填写，不可事后补填。</strong>
+      </div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-time">0:15 - 0:65（50分钟）</div>
+      <div class="tl-title">💻 学生独立操作实训</div>
+      <div class="tl-body">
+        学生按任务单顺序完成5个环节，教师巡视指导。
+        <br><strong>重点关注节点：</strong>
+        <ul style="margin-top:6px">
+          <li>环节②：学生是否理解了"篡改哈希"演示的含义</li>
+          <li>环节④：学生对温控预警的处置选择（无标准答案，鼓励讨论）</li>
+          <li>环节⑤：学生是否找到HN-2024-0923的问题节点</li>
+        </ul>
+      </div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-time">1:05 - 1:20（15分钟）</div>
+      <div class="tl-title">🗣️ 课堂讨论与总结</div>
+      <div class="tl-body">
+        组织2-3名学生分享：<br>
+        ① 你在哪个环节遇到了困难？<br>
+        ② 温控预警你选了哪个方案？为什么？<br>
+        ③ HN批次问题出在哪？如果你是监管员会怎么处理？
+      </div>
+    </div>
+    <div class="tl-item">
+      <div class="tl-time">1:20 - 1:30（10分钟）</div>
+      <div class="tl-title">✍️ 填写反思题 + 收取任务单</div>
+      <div class="tl-body">
+        学生完成任务单上的"实训反思"部分，教师收取，课后批改评分。
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- 各环节教学要点 -->
+<div class="card">
+  <div class="card-title">🎯 三、各环节教学要点与干预建议</div>
+  <table>
+    <tr>
+      <th>环节</th><th>常见问题</th><th>教师干预建议</th><th>核心知识点</th>
+    </tr>
+    <tr>
+      <td><strong>①产地录入</strong></td>
+      <td>学生不知道填什么，信息随意填写</td>
+      <td>提示学生：假设自己是赣州果农，想象真实的种植场景去填，这些数据在现实中对溯源意味着什么</td>
+      <td>溯源码的生成逻辑；产地数据的关键字段</td>
+    </tr>
+    <tr>
+      <td><strong>②检测上链</strong></td>
+      <td>不理解"哈希值"是什么；哈希篡改演示看不懂</td>
+      <td>类比解释：<em>"哈希就像数据的指纹，内容变了指纹就不一样"</em>。黑板写：原始数据→SHA256→32位十六进制码</td>
+      <td>SHA-256哈希原理；区块链的链式结构；不可篡改特性</td>
+    </tr>
+    <tr>
+      <td><strong>③仓储管理</strong></td>
+      <td>不知道先扫码还是先选库位；出库按钮灰色</td>
+      <td>提示流程：先输入溯源码→再选库位→再点入库→然后才能出库。出库按钮灰色是因为未完成入库</td>
+      <td>WMS操作流程；先进先出（FIFO）原则</td>
+    </tr>
+    <tr>
+      <td><strong>④冷链运输</strong></td>
+      <td>运输进行中不确定要不要操作；预警弹出时不知如何选</td>
+      <td>告诉学生：运输过程中主要是"监控"，看温度曲线变化；预警出现时要做出选择，三个方案没有绝对对错，重点是要有理由</td>
+      <td>冷链关键控制点（CCP）；温度偏差的处置原则</td>
+    </tr>
+    <tr>
+      <td><strong>⑤溯码查验</strong></td>
+      <td>找不到HN批次的问题；不知道什么算"异常"</td>
+      <td>提示：查看每个节点的详情，重点看检测结论，再看后续是否按要求处理。HN批次的问题是"检测不合格但仍强行入库流通"</td>
+      <td>食品安全监管逻辑；溯源的监管价值；发现链条断裂的方法</td>
+    </tr>
+  </table>
+</div>
+
+<!-- 评分标准 -->
+<div class="card">
+  <div class="card-title">📊 四、评分标准（满分100分）</div>
+  <table class="score-rubric">
+    <tr>
+      <th>环节（分值）</th><th>优秀（90-100%）</th><th>良好（70-89%）</th><th>合格（60-69%）</th><th>需改进（<60%）</th>
+    </tr>
+    <tr>
+      <td><strong>①产地录入</strong><br>（20分）</td>
+      <td>所有字段完整填写，农药记录合理，反思题回答有深度</td>
+      <td>主要字段填写，农药记录合理，反思题有基本回答</td>
+      <td>填写了基本信息，有溯源码</td>
+      <td>信息缺失严重或敷衍了事</td>
+    </tr>
+    <tr>
+      <td><strong>②检测上链</strong><br>（20分）</td>
+      <td>检测数据完整，正确描述哈希篡改实验结果，能用自己的话解释区块链原理</td>
+      <td>数据基本完整，能描述实验现象</td>
+      <td>完成了上链操作，有实验记录</td>
+      <td>未做实验记录或理解明显错误</td>
+    </tr>
+    <tr>
+      <td><strong>③仓储操作</strong><br>（20分）</td>
+      <td>入库出库均完成，库位记录准确，能说明FIFO意义</td>
+      <td>入库出库完成，记录基本准确</td>
+      <td>完成了入库操作</td>
+      <td>未完成基本操作</td>
+    </tr>
+    <tr>
+      <td><strong>④冷链监控</strong><br>（20分）</td>
+      <td>准确记录温度异常数值，处置方案选择有明确理由，能比较三方案优缺点</td>
+      <td>记录了温度异常，有选择理由</td>
+      <td>完成了运输监控，有基本记录</td>
+      <td>未做处置或无记录</td>
+    </tr>
+    <tr>
+      <td><strong>⑤溯码查验</strong><br>（20分）</td>
+      <td>准确识别三批次状态，指出HN批次的具体问题节点，分析有深度</td>
+      <td>找出了HN批次问题，有基本分析</td>
+      <td>完成了三批次查询</td>
+      <td>未完成查询或结论错误</td>
+    </tr>
+  </table>
+  <div class="tip" style="margin-top:12px">
+    💡 <strong>加分项</strong>：实训反思部分回答有深度、有创见（如提出具体的数字化建设方案），可在总分基础上酌情加1-5分。
+  </div>
+</div>
+
+<!-- 参考答案 -->
+<div class="card">
+  <div class="card-title">📝 五、关键题目参考答案</div>
+  
+  <h3 style="margin-bottom:8px">【区块链篡改实验】</h3>
+  <div class="answer-box">
+    <div class="answer-title">实验现象：</div>
+    篡改前：第1号区块哈希值为一串固定的十六进制数（如 a3f2...）；第2号区块包含该哈希，链条完整。<br>
+    篡改后：第1号区块的哈希值因数据变化而改变；第2号区块仍记录旧哈希，两者不再匹配，链条断裂，系统标红报警。
+  </div>
+  <div class="answer-box" style="margin-top:8px">
+    <div class="answer-title">如果只用普通数据库的风险：</div>
+    数据库管理员或黑客可以直接修改任何记录（如将"不合格"改为"合格"），且修改后没有痕迹，无法追溯，
+    导致溯源数据失去可信度，形同虚设。
+  </div>
+  
+  <h3 style="margin-bottom:8px;margin-top:16px">【HN-2024-0923批次分析】</h3>
+  <div class="answer-box">
+    <div class="answer-title">问题所在：</div>
+    <ol>
+      <li><strong>农残超标</strong>：实测值0.08 mg/kg，超过国家标准上限0.05 mg/kg</li>
+      <li><strong>违规流通</strong>：检测不合格后，该批次未被拦截销毁，而是强行入库并继续流入市场</li>
+      <li><strong>监管失职</strong>：本应在检测上链环节被终止，说明存在违规操作或监管漏洞</li>
+    </ol>
+    <br>违反的规定：《食品安全法》第三十四条（禁止超标农残食品上市流通）；
+    《农产品质量安全法》关于产地准出制度的规定。
+  </div>
+
+  <h3 style="margin-bottom:8px;margin-top:16px">【冷链预警处置方案比较】</h3>
+  <div class="answer-box">
+    <table>
+      <tr><th>方案</th><th>适用场景</th><th>主要风险</th></tr>
+      <tr><td>联系司机修复</td><td>故障可快速修复，距目的地较近</td><td>若修复耗时较长，产品损耗持续加剧</td></tr>
+      <tr><td>就近转仓换车</td><td>故障无法快速修复，产品量大、价值高</td><td>增加额外成本，可能造成2-5%的损耗</td></tr>
+      <tr><td>上报质量安全事件</td><td>温度偏差严重、产品可能已受损</td><td>运输严重延误，可能引发合同违约</td></tr>
+    </table>
+    <p style="margin-top:8px;font-size:12px;color:#888">注：本题无标准答案，重点评价学生的判断逻辑是否合理。</p>
+  </div>
+</div>
+
+<!-- 常见问题 -->
+<div class="card">
+  <div class="card-title">❓ 六、常见问题与解决方案</div>
+  <table>
+    <tr><th>问题</th><th>解决方案</th></tr>
+    <tr><td>网页打不开</td><td>确认浏览器版本（Chrome 80+/Edge 80+），避免使用IE；检查文件路径是否有中文</td></tr>
+    <tr><td>哈希计算失败</td><td>平台自带降级哈希算法，即使无网络也可运行，哈希值格式可能略有不同但不影响演示效果</td></tr>
+    <tr><td>冷链运输太快学生跟不上</td><td>告知学生：运输动画约18秒，预警会自动弹出，不必着急，等待预警出现后再处置即可</td></tr>
+    <tr><td>学生刷新后数据丢失</td><td>本平台数据存在内存中，刷新会清空。告知学生：操作前先填好任务单记录，不要随意刷新</td></tr>
+    <tr><td>学生直接跳到最后一步</td><td>平台设有步骤锁定，只能顺序前进，不能跨步骤。但可以返回查看已完成的步骤</td></tr>
+  </table>
+</div>
+
+<!-- 拓展应用 -->
+<div class="card">
+  <div class="card-title">🚀 七、教学拓展建议</div>
+  <div class="two-col">
+    <div class="mini-card">
+      <div style="font-size:20px;margin-bottom:6px">📱</div>
+      <div style="font-weight:bold;margin-bottom:4px">对接真实溯源平台</div>
+      <div style="font-size:13px;color:#666">课后布置作业：扫描超市农产品溯源码，与仿真系统对比，找出真实平台与仿真平台的异同</div>
+    </div>
+    <div class="mini-card">
+      <div style="font-size:20px;margin-bottom:6px">🏢</div>
+      <div style="font-weight:bold;margin-bottom:4px">企业案例延伸</div>
+      <div style="font-size:13px;color:#666">引入阿里云食品安全追溯、京东农业溯源、拼多多百亿补贴溯源等真实平台案例进行对比讨论</div>
+    </div>
+    <div class="mini-card">
+      <div style="font-size:20px;margin-bottom:6px">📊</div>
+      <div style="font-weight:bold;margin-bottom:4px">数据分析延伸</div>
+      <div style="font-size:13px;color:#666">收集班级所有同学的冷链处置选择，统计比例，讨论：什么样的岗位特点决定了决策倾向？</div>
+    </div>
+    <div class="mini-card">
+      <div style="font-size:20px;margin-bottom:6px">🎭</div>
+      <div style="font-weight:bold;margin-bottom:4px">4人小组角色分工版</div>
+      <div style="font-size:13px;color:#666">进阶版：4人一组分工扮演不同角色，前一同学操作完后，将溯源码传给下一位继续，体验协作流程</div>
+    </div>
+  </div>
+</div>
+
+<!-- 文件清单 -->
+<div class="card">
+  <div class="card-title">📁 八、配套资源文件清单</div>
+  <table>
+    <tr><th>文件名</th><th>用途</th><th>使用对象</th></tr>
+    <tr>
+      <td><code>index.html</code></td>
+      <td>仿真实训主平台（学生在电脑上操作）</td>
+      <td>学生（每台电脑打开）</td>
+    </tr>
+    <tr>
+      <td><code>student_task_sheet.html</code></td>
+      <td>学生实训任务单（打印后发放）</td>
+      <td>学生（打印，每人一份）</td>
+    </tr>
+    <tr>
+      <td><code>teacher_guide.html</code></td>
+      <td>本文件：教师操作指南</td>
+      <td>教师（课前阅读）</td>
+    </tr>
+  </table>
+  <div class="tip" style="margin-top:12px">
+    💡 三个文件放在同一文件夹即可，直接用浏览器打开，无需安装任何软件，无需联网。
+  </div>
+</div>
+
+</div>
+</body>
+</html>
