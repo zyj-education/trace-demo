@@ -390,26 +390,60 @@
       return params.get('code') || 'GN-2024-1101'; // 默认显示赣南脐橙
     }
 
+    // 获取所有URL参数
+    function getURLParams() {
+      const params = new URLSearchParams(window.location.search);
+      return {
+        code: params.get('code') || 'GN-2024-1101',
+        name: params.get('name') || '赣南脐橙',
+        variety: params.get('variety') || '纽荷尔脐橙',
+        farm: params.get('farm') || '信丰县绿源农业合作社',
+        date: params.get('date') || '2024-11-01',
+        weight: params.get('weight') || '2000',
+        address: params.get('address') || '江西省赣州市信丰县',
+        manager: params.get('manager') || '张农户'
+      };
+    }
+
     // 显示溯源信息
     function displayTraceInfo() {
-      const code = getTraceCodeFromURL();
-      const data = traceDatabase[code];
+      const params = getURLParams();
+      const code = params.code;
 
-      if (data) {
-        document.getElementById('productName').textContent = data.productName;
-        document.getElementById('variety').textContent = data.variety;
-        document.getElementById('traceCode').textContent = data.traceCode;
-        document.getElementById('farm').textContent = data.farm;
-        document.getElementById('address').textContent = data.address;
-        document.getElementById('harvestDate').textContent = data.harvestDate;
-        document.getElementById('weight').textContent = data.weight;
-        document.getElementById('pesticideTest').textContent = data.pesticideTest;
-        document.getElementById('step1').textContent = data.step1;
-        document.getElementById('step2').textContent = data.step2;
-        document.getElementById('step3').textContent = data.step3;
-        document.getElementById('step4').textContent = data.step4;
-        document.getElementById('step5').textContent = data.step5;
-      }
+      // 优先使用URL参数，否则使用预定义数据库
+      const data = traceDatabase[code] || {};
+
+      // 合并URL参数和数据库数据（URL参数优先）
+      const traceData = {
+        productName: params.name || data.productName || '未知产品',
+        variety: params.variety || data.variety || '-',
+        traceCode: code,
+        farm: params.farm || data.farm || '-',
+        address: params.address || data.address || '-',
+        harvestDate: params.date || data.harvestDate || '-',
+        weight: (params.weight || data.weight || '-') + ' kg',
+        pesticideTest: data.pesticideTest || '符合标准',
+        step1: (params.date || data.harvestDate || '-') + ' ' + (params.farm || data.farm || '-'),
+        step2: data.step2 || (params.date || '-') + ' 质检合格',
+        step3: data.step3 || '-',
+        step4: data.step4 || '温控运输中',
+        step5: data.step5 || '-'
+      };
+
+      // 更新页面元素
+      document.getElementById('productName').textContent = traceData.productName;
+      document.getElementById('variety').textContent = traceData.variety;
+      document.getElementById('traceCode').textContent = traceData.traceCode;
+      document.getElementById('farm').textContent = traceData.farm;
+      document.getElementById('address').textContent = traceData.address;
+      document.getElementById('harvestDate').textContent = traceData.harvestDate;
+      document.getElementById('weight').textContent = traceData.weight;
+      document.getElementById('pesticideTest').textContent = traceData.pesticideTest;
+      document.getElementById('step1').textContent = traceData.step1;
+      document.getElementById('step2').textContent = traceData.step2;
+      document.getElementById('step3').textContent = traceData.step3;
+      document.getElementById('step4').textContent = traceData.step4;
+      document.getElementById('step5').textContent = traceData.step5;
 
       // 显示扫描时间
       const now = new Date();

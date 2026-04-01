@@ -1170,17 +1170,19 @@ function generateQRCode(traceCode) {
   const container = document.getElementById('qrcode_image');
   container.innerHTML = ''; // 清空之前的二维码
 
-  // 构建溯源链路详情
+  // 构建溯源信息编码
   const productName = state.productData?.name || '赣南脐橙';
   const variety = state.productData?.variety || '纽荷尔脐橙';
   const farm = state.productData?.farm || '信丰县绿源农业合作社';
   const harvestDate = state.productData?.harvestDate || '2024-11-01';
   const weight = state.productData?.weight || '2000';
 
-  const traceInfo = `【农产品溯源信息】📦${productName} 🌱${variety} 📍${farm} 📅${harvestDate} ⚖️${weight}kg 🔖${traceCode}`;
+  // 溯源查询URL（部署到GitHub Pages后）
+  const baseUrl = 'https://zyj-education.github.io/trace-demo';
+  const traceUrl = `${baseUrl}/trace.html?code=${encodeURIComponent(traceCode)}&name=${encodeURIComponent(productName)}&variety=${encodeURIComponent(variety)}&farm=${encodeURIComponent(farm)}&date=${encodeURIComponent(harvestDate)}&weight=${encodeURIComponent(weight)}`;
 
-  // 使用 QRServer API 生成二维码
-  const qrUrl = 'https://api.qrserver.com/v1/create-qr-code/?size=140x140&data=' + encodeURIComponent(traceInfo);
+  // 使用 QRServer API 生成二维码（指向在线网页）
+  const qrUrl = 'https://api.qrserver.com/v1/create-qr-code/?size=140x140&data=' + encodeURIComponent(traceUrl);
 
   container.innerHTML = `
     <div style="background:white;padding:8px;border-radius:8px;display:inline-block;box-shadow:0 2px 8px rgba(0,0,0,0.08);margin:8px 0">
@@ -1484,14 +1486,15 @@ function generateMyQRCode() {
   const address = state.productData?.address || '江西省赣州市信丰县';
   const manager = state.productData?.manager || '张农户';
 
-  // 溯源链路详情（简化版，微信扫码后显示的文本）
-  const traceInfo = `【农产品溯源信息】📦${productName} 🌱${variety} 📍${farm} 📅${harvestDate} ⚖️${weight}kg 🔖${code}`;
+  // 溯源查询URL（部署到GitHub Pages后）
+  const baseUrl = 'https://zyj-education.github.io/trace-demo';
+  const traceUrl = `${baseUrl}/trace.html?code=${encodeURIComponent(code)}&name=${encodeURIComponent(productName)}&variety=${encodeURIComponent(variety)}&farm=${encodeURIComponent(farm)}&date=${encodeURIComponent(harvestDate)}&weight=${encodeURIComponent(weight)}&address=${encodeURIComponent(address)}&manager=${encodeURIComponent(manager)}`;
 
   // 显示溯源码
   document.getElementById('my_trace_code').textContent = '溯源码：' + code;
 
-  // 使用 QRServer API 生成二维码
-  const qrUrl = 'https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=' + encodeURIComponent(traceInfo);
+  // 使用 QRServer API 生成二维码（指向在线网页）
+  const qrUrl = 'https://api.qrserver.com/v1/create-qr-code/?size=200x200&data=' + encodeURIComponent(traceUrl);
 
   container.innerHTML = `
     <div style="background:white;padding:12px;border-radius:12px;display:inline-block;box-shadow:0 4px 12px rgba(0,0,0,0.1);margin:8px 0">
